@@ -3,13 +3,13 @@ import * as AuthSession from "expo-auth-session";
 import * as WebBrowser from "expo-web-browser";
 import Constants from "expo-constants";
 import { authConfig } from "../authConfig";
-import { fetchUserInfo } from "../utils/userInfo";
+import { useUser } from "../app/context/UserContext";
 
 WebBrowser.maybeCompleteAuthSession();
 
 export function useAuth() {
-  const [token, setToken] = useState(null);
-  const [user, setUser] = useState(null);
+  const [token, setToken] = useState<string | null>(null);
+  const { user, setUser } = useUser();
 
   const discovery = AuthSession.useAutoDiscovery(
     `https://${authConfig.domain}`
@@ -21,6 +21,9 @@ export function useAuth() {
       scopes: ["openid", "profile", "email"],
       redirectUri: AuthSession.makeRedirectUri({ useProxy: true }),
       responseType: AuthSession.ResponseType.Token,
+      extraParams: {
+        audience: authConfig.audience,
+      },
     },
     discovery
   );
@@ -38,11 +41,26 @@ export function useAuth() {
 
   useEffect(() => {
     if (!token) return;
-    const loadUserInfo = async () => {
-      const info = await fetchUserInfo(token);
-      setUser(info);
+
+    const fetchUserFromAPI = async () => {
+      try {
+        const res = await fetch("https://be-star-step-app-1.onrender.com/api/user/me", {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
+
+        if (!res.ok) throw new Error("Failed to fetch user");
+
+        const data = await res.json();
+        setUser(data);
+        console.log("User from backend:", data);
+      } catch (err) {
+        console.error("Error fetching user from backend:", err);
+      }
     };
-    loadUserInfo();
+
+    fetchUserFromAPI();
   }, [token]);
 
   return { login, token, user };

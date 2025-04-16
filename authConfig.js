@@ -5,6 +5,7 @@ const useProxy = true;
 export const authConfig = {
   domain: Constants.expoConfig.extra.auth0Domain,
   clientId: Constants.expoConfig.extra.auth0ClientId,
+  audience: Constants.expoConfig.extra.EXPO_PUBLIC_AUTH0_AUDIENCE,
   redirectUri: AuthSession.makeRedirectUri({
     useProxy,
   }),

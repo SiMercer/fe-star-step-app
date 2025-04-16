@@ -1,25 +1,29 @@
 import React from "react";
 import { View, Text, Button, ScrollView } from "react-native";
-import { useAuth } from "../hooks/useAuth";
+import { Link } from "expo-router";
 
 export default function HomeScreen() {
-  const { login, token, user } = useAuth();
-
   return (
     <ScrollView contentContainerStyle={{ flexGrow: 1, justifyContent: "center", alignItems: "center", padding: 20 }}>
-      <Text style={{ fontSize: 28, marginBottom: 20 }}>Welcome to StarSteps 🚀</Text>
+      <Text style={{ fontSize: 28, marginBottom: 20 }}>StarSteps</Text>
 
-      <Button title="LOGIN WITH AUTH0" onPress={login} />
+      <View style={{ marginBottom: 20, width: "100%" }}>
+        <Link href="/child" asChild>
+          <Button title="Child 1 Dashboard" />
+        </Link>
+      </View>
 
-      <Text style={{ marginTop: 20, fontWeight: "bold" }}>Token:</Text>
-      <Text selectable style={{ marginVertical: 10, fontSize: 12 }}>
-        {token ? token : "No token yet"}
-      </Text>
+      <View style={{ marginBottom: 20, width: "100%" }}>
+        <Link href="/parent/login" asChild>
+          <Button title="Parent Login" />
+        </Link>
+      </View>
 
-      <Text style={{ marginTop: 20, fontWeight: "bold" }}>User Info:</Text>
-      <Text selectable style={{ fontSize: 12 }}>
-        {user ? JSON.stringify(user, null, 2) : "No user info yet"}
-      </Text>
+      <View style={{ width: "100%" }}>
+        <Link href="/parent/register" asChild>
+          <Button title="Register" />
+        </Link>
+      </View>
     </ScrollView>
   );
 }

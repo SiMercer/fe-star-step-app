@@ -10,6 +10,7 @@ WebBrowser.maybeCompleteAuthSession();
 export function useAuth() {
   const [token, setToken] = useState<string | null>(null);
   const { user, setUser } = useUser();
+  const useProxy = process.env.NODE_ENV !== "production";
 
   const discovery = AuthSession.useAutoDiscovery(
     `https://${authConfig.domain}`
@@ -19,7 +20,7 @@ export function useAuth() {
     {
       clientId: authConfig.clientId,
       scopes: ["openid", "profile", "email"],
-      redirectUri: AuthSession.makeRedirectUri({ useProxy: true }),
+      redirectUri: AuthSession.makeRedirectUri({ useProxy }),
       responseType: AuthSession.ResponseType.Token,
       extraParams: {
         audience: authConfig.audience,

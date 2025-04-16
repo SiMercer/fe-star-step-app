@@ -9,7 +9,7 @@ export default function ParentRewardsScreen() {
     <View style={styles.container}>
       <Text style={styles.heading}>Rewards Title</Text>
       <Text style={styles.subtext}>
-        This is where the parent can view and manage rewards for completed tasks.
+        Rewards.
       </Text>
 
       <View style={styles.buttonGroup}>

@@ -3,7 +3,7 @@ import * as AuthSession from "expo-auth-session";
 import * as WebBrowser from "expo-web-browser";
 import Constants from "expo-constants";
 import { authConfig } from "../authConfig";
-// import { useUser } from "../app/context/UserContext";
+import { useUser } from "../app/context/UserContext";
 
 WebBrowser.maybeCompleteAuthSession();
 

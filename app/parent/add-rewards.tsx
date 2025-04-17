@@ -1,5 +1,6 @@
 import React, { useState } from "react";
-import { View, TextInput, Button, Picker, StyleSheet } from "react-native";
+import { View, TextInput, Button, StyleSheet } from "react-native";
+import Picker from "@react-native-picker/datetimepicker";
 
 type AddRewardFormProps = {
   onAddReward: (title: string, cost: number) => void;

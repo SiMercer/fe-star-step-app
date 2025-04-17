@@ -27,7 +27,6 @@ export function useAuth() {
     discovery
   );
 
-
   const saveToken = async (accessToken: string) => {
     if (Platform.OS === "web") {
       localStorage.setItem("userToken", accessToken);
@@ -35,7 +34,6 @@ export function useAuth() {
       await SecureStore.setItemAsync("userToken", accessToken);
     }
   };
-
 
   const loadToken = async () => {
     if (Platform.OS === "web") {
@@ -45,9 +43,7 @@ export function useAuth() {
     }
   };
 
-
   const login = () => {
-    console.log("Auth0 domain:", authConfig.domain);
     if (!request) return;
     promptAsync({ useProxy: authConfig.useProxy });
   };
@@ -76,28 +72,43 @@ export function useAuth() {
     }
   }, [response]);
 
+
   useEffect(() => {
     if (!token) return;
 
-    const fetchUserFromAPI = async () => {
+    const fetchAndSyncUser = async () => {
       try {
-        const res = await fetch("https://be-star-step-app-1.onrender.com/api/user/me", {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
+
+        const userRes = await fetch("https://be-star-step-app-1.onrender.com/api/user/me", {
+          headers: { Authorization: `Bearer ${token}` },
         });
 
-        if (!res.ok) throw new Error("Failed to fetch user");
+        if (!userRes.ok) throw new Error("Failed to fetch Auth0 user");
+        const userInfo = await userRes.json();
 
-        const data = await res.json();
-        setUser(data);
-        console.log("User from backend:", data);
+
+        const parentRes = await fetch("https://be-star-step-app-1.onrender.com/api/parents", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            auth0Id: userInfo.sub,
+            parentName: userInfo.name || userInfo.nickname || "Unnamed",
+          }),
+        });
+
+        if (!parentRes.ok) throw new Error("Failed to register parent");
+        const parent = await parentRes.json();
+
+        setUser(parent);
+        console.log("Synced parent:", parent);
       } catch (err) {
-        console.error("Error fetching user from backend:", err);
+        console.error("Error syncing parent user:", err);
       }
     };
 
-    fetchUserFromAPI();
+    fetchAndSyncUser();
   }, [token]);
 
   return { login, token, user };

@@ -6,11 +6,14 @@ const { auth0Domain, auth0ClientId, auth0Audience, redirectUri } = Constants.exp
 console.log("Loaded Auth0 domain:", authConfig.domain);
 console.log("Audience:", authConfig.audience);
 console.log("Redirect URI:", authConfig.redirectUri);
+console.log("Auth0 domain loaded from env:", Constants.expoConfig.extra?.auth0Domain);
 
 export const authConfig = {
-  domain: process.env.EXPO_PUBLIC_AUTH0_DOMAIN!,
-  clientId: process.env.EXPO_PUBLIC_AUTH0_CLIENT_ID!,
-  audience: process.env.EXPO_PUBLIC_AUTH0_AUDIENCE!,
-  redirectUri: process.env.EXPO_PUBLIC_REDIRECT_URI!,
+  domain: import.meta.env.VITE_AUTH0_DOMAIN || process.env.EXPO_PUBLIC_AUTH0_DOMAIN,
+  clientId: import.meta.env.VITE_AUTH0_CLIENT_ID || process.env.EXPO_PUBLIC_AUTH0_CLIENT_ID,
+  audience: import.meta.env.VITE_AUTH0_AUDIENCE || process.env.EXPO_PUBLIC_AUTH0_AUDIENCE,
+  redirectUri: import.meta.env.VITE_REDIRECT_URI || process.env.EXPO_PUBLIC_REDIRECT_URI,
   useProxy: false,
+  scopes: ["openid", "profile", "email"],
+  responseType: "token",
 };

@@ -3,6 +3,9 @@ import { View, Text, Button, ScrollView } from "react-native";
 import { useAuth } from "../../hooks/useAuth";
 import { Link } from "expo-router";
 
+console.log("Auth0 domain:", Constants.expoConfig.extra.EXPO_PUBLIC_AUTH0_DOMAIN);
+
+
 export default function ParentLoginScreen() {
   const { login, token, user } = useAuth();
 

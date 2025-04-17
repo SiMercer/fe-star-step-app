@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { Pressable, StyleSheet, Text, View } from "react-native";
+import { editReward } from "../../utils/api";
 
 interface ItemBoxProps {
   reward: {
@@ -13,40 +14,61 @@ interface ItemBoxProps {
 }
 
 export default function ChildsRewardsItem({ reward }: ItemBoxProps) {
-  const [isRequested, setIsRequested] = useState(reward.isRedeemed);
-  return (
-    <View style={styles.default}>
+  // When we have contexts replace this with context
+  const childContextTemp = "000000000000000000000002";
+  const [isRequested, setIsRequested] = useState(
+    reward.redeemedBy === childContextTemp
+  );
+  function handleRequestPress() {
+    setIsRequested(!isRequested);
+    if (isRequested) {
+      editReward(reward.reward_id, { $unset: { redeemedBy: "" } });
+    } else {
+      editReward(reward.reward_id, { redeemedBy: childContextTemp });
+    }
+  }
+  return reward.isRedeemed && reward.redeemedBy !== childContextTemp ? null : (
+    <View
+      style={
+        reward.isRedeemed && reward.redeemedBy === childContextTemp
+          ? styles.redeemed
+          : reward.redeemedBy === childContextTemp || !reward.redeemedBy
+          ? styles.default
+          : styles.greyed
+      }
+    >
       <Text style={{ width: "40%" }}>{reward.title}</Text>
       <Text style={{ alignSelf: "center" }}>{reward.cost + "⭐"}</Text>
       <View style={{ width: "40%", alignItems: "flex-end" }}>
-        <Pressable
-          style={{
-            height: 24,
-            width: 45,
-            borderRadius: 12,
-            borderWidth: 2,
-            borderColor: "#000",
-            justifyContent: "center",
-          }}
-          onPress={() => {
-            setIsRequested(!isRequested);
-          }}
-        >
-          <View
-            style={isRequested ? styles.slide : styles.slideRequested}
-          ></View>
-        </Pressable>
-        <View>
-          <Text>{isRequested ? "Requested!" : "Request?"}</Text>
-        </View>
+        {reward.isRedeemed ? (
+          <Text>Redeemed!!!</Text>
+        ) : reward.redeemedBy !== childContextTemp && reward.redeemedBy ? (
+          <Text>Requested by Kid 2</Text>
+        ) : (
+          <>
+            <Pressable
+              style={styles.sliderOutline}
+              onPress={handleRequestPress}
+            >
+              <View
+                style={isRequested ? styles.slider : styles.sliderRequested}
+              ></View>
+            </Pressable>
+            <View>
+              <Text>{isRequested ? "Requested!" : "Request?"}</Text>
+            </View>
+          </>
+        )}
       </View>
     </View>
   );
 }
 const styles = StyleSheet.create({
   default: {
+    height: 70,
     width: "100%",
     padding: 10,
+    marginBottom: 5,
     borderWidth: 5,
     borderColor: "#000",
     flexDirection: "row",
@@ -54,16 +76,30 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   redeemed: {
+    height: 70,
     width: "100%",
     padding: 10,
+    marginBottom: 5,
     borderWidth: 5,
     borderColor: "#000",
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
-    backgroundColor: "0f0",
+    backgroundColor: "#0f0",
   },
-  slide: {
+  greyed: {
+    height: 70,
+    width: "100%",
+    padding: 10,
+    marginBottom: 5,
+    borderWidth: 5,
+    borderColor: "#000",
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    backgroundColor: "#aaa",
+  },
+  slider: {
     height: 12,
     width: 12,
     borderRadius: 6,
@@ -71,12 +107,20 @@ const styles = StyleSheet.create({
     alignSelf: "flex-end",
     margin: 5,
   },
-  slideRequested: {
+  sliderRequested: {
     height: 12,
     width: 12,
     borderRadius: 6,
     backgroundColor: "#000",
     alignSelf: "flex-start",
     margin: 5,
+  },
+  sliderOutline: {
+    height: 24,
+    width: 45,
+    borderRadius: 12,
+    borderWidth: 2,
+    borderColor: "#000",
+    justifyContent: "center",
   },
 });

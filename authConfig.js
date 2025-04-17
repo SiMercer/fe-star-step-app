@@ -3,17 +3,13 @@ import Constants from "expo-constants";
 
 const useProxy = false;
 
-const redirectUri = AuthSession.makeRedirectUri({
-  useProxy,
-});
-
-console.log("Redirect URI in use:", redirectUri);
-
 export const authConfig = {
-  domain: Constants.expoConfig.extra.auth0Domain,
-  clientId: Constants.expoConfig.extra.auth0ClientId,
-  audience: Constants.expoConfig.extra.auth0Audience,
-  redirectUri,
+  domain: Constants.expoConfig.extra.EXPO_PUBLIC_AUTH0_DOMAIN,
+  clientId: Constants.expoConfig.extra.EXPO_PUBLIC_AUTH0_CLIENT_ID,
+  audience: Constants.expoConfig.extra.EXPO_PUBLIC_AUTH0_AUDIENCE,
+  redirectUri: AuthSession.makeRedirectUri({
+    useProxy,
+  }),
   useProxy,
   scopes: ["openid", "profile", "email"],
   responseType: "code",

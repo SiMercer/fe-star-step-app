@@ -29,7 +29,11 @@ export function useAuth() {
     discovery
   );
 
+
+
   const login = () => {
+    console.log("Auth0 domain:", authConfig.domain);
+
     if (!request) return;
     promptAsync({ useProxy: authConfig.useProxy });
   };

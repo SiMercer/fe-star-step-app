@@ -4,20 +4,15 @@ import * as WebBrowser from "expo-web-browser";
 import Constants from "expo-constants";
 import { authConfig } from "../authConfig";
 import { useUser } from "../app/context/UserContext";
+import * as SecureStore from "expo-secure-store";
 
 WebBrowser.maybeCompleteAuthSession();
 
 export function useAuth() {
-  const { token, setToken, setUser } = useUser();
-  const { user, setUser } = useUser();
+  const { token, setToken, user, setUser } = useUser();
   const useProxy = process.env.NODE_ENV !== "production";
 
   const discovery = AuthSession.useAutoDiscovery(`https://${authConfig.domain}`);
-
-  console.log("Auth0 domain:", authConfig.domain);
-
-
-
   const [request, response, promptAsync] = AuthSession.useAuthRequest(
     {
       clientId: authConfig.clientId,
@@ -33,30 +28,41 @@ export function useAuth() {
 
   const login = () => {
     console.log("Auth0 domain:", authConfig.domain);
-
     if (!request) return;
     promptAsync({ useProxy: authConfig.useProxy });
   };
 
+
+  useEffect(() => {
+    const loadToken = async () => {
+      const storedToken = await SecureStore.getItemAsync("userToken");
+      if (storedToken) {
+        setToken(storedToken);
+      }
+    };
+    loadToken();
+  }, []);
+
+
   useEffect(() => {
     if (response?.type === "success" && response.authentication?.accessToken) {
-      setToken(response.authentication.accessToken);
+      const accessToken = response.authentication.accessToken;
+      setToken(accessToken);
+      SecureStore.setItemAsync("userToken", accessToken);
     }
   }, [response]);
+
 
   useEffect(() => {
     if (!token) return;
 
     const fetchUserFromAPI = async () => {
       try {
-        const res = await fetch(
-          "https://be-star-step-app-1.onrender.com/api/user/me",
-          {
-            headers: {
-              Authorization: `Bearer ${token}`,
-            },
-          }
-        );
+        const res = await fetch("https://be-star-step-app-1.onrender.com/api/user/me", {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
 
         if (!res.ok) throw new Error("Failed to fetch user");
 

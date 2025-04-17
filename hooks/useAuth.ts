@@ -1,10 +1,10 @@
-import { useState, useEffect } from "react";
+import { useEffect } from "react";
+import { Platform } from "react-native";
 import * as AuthSession from "expo-auth-session";
 import * as WebBrowser from "expo-web-browser";
-import Constants from "expo-constants";
+import * as SecureStore from "expo-secure-store";
 import { authConfig } from "../authConfig";
 import { useUser } from "../app/context/UserContext";
-import * as SecureStore from "expo-secure-store";
 
 WebBrowser.maybeCompleteAuthSession();
 
@@ -13,6 +13,7 @@ export function useAuth() {
   const useProxy = process.env.NODE_ENV !== "production";
 
   const discovery = AuthSession.useAutoDiscovery(`https://${authConfig.domain}`);
+
   const [request, response, promptAsync] = AuthSession.useAuthRequest(
     {
       clientId: authConfig.clientId,
@@ -26,6 +27,25 @@ export function useAuth() {
     discovery
   );
 
+
+  const saveToken = async (accessToken: string) => {
+    if (Platform.OS === "web") {
+      localStorage.setItem("userToken", accessToken);
+    } else {
+      await SecureStore.setItemAsync("userToken", accessToken);
+    }
+  };
+
+
+  const loadToken = async () => {
+    if (Platform.OS === "web") {
+      return localStorage.getItem("userToken");
+    } else {
+      return await SecureStore.getItemAsync("userToken");
+    }
+  };
+
+
   const login = () => {
     console.log("Auth0 domain:", authConfig.domain);
     if (!request) return;
@@ -34,13 +54,17 @@ export function useAuth() {
 
 
   useEffect(() => {
-    const loadToken = async () => {
-      const storedToken = await SecureStore.getItemAsync("userToken");
-      if (storedToken) {
-        setToken(storedToken);
+    const init = async () => {
+      try {
+        const storedToken = await loadToken();
+        if (storedToken) {
+          setToken(storedToken);
+        }
+      } catch (err) {
+        console.error("Error loading stored token:", err);
       }
     };
-    loadToken();
+    init();
   }, []);
 
 
@@ -48,10 +72,9 @@ export function useAuth() {
     if (response?.type === "success" && response.authentication?.accessToken) {
       const accessToken = response.authentication.accessToken;
       setToken(accessToken);
-      SecureStore.setItemAsync("userToken", accessToken);
+      saveToken(accessToken);
     }
   }, [response]);
-
 
   useEffect(() => {
     if (!token) return;

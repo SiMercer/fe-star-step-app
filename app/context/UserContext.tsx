@@ -35,10 +35,28 @@ import { createContext, useContext, useState } from "react";
 
 const UserContext = createContext(null);
 
-export const UserProvider = ({ children }) => {
-  const [user, setUser] = useState(null);
+type UserContextType = {
+  user: UserType | null;
+  setUser: React.Dispatch<React.SetStateAction<UserType | null>>;
+  token: string | null;
+  setToken: React.Dispatch<React.SetStateAction<string | null>>;
+};
+
+export const UserContext = createContext<UserContextType>({
+  user: null,
+  setUser: () => {},
+  token: null,
+  setToken: () => {},
+});
+
+export const useUser = () => useContext(UserContext);
+
+export const UserProvider = ({ children }: { children: ReactNode }) => {
+  const [user, setUser] = useState<UserType | null>(null);
+  const [token, setToken] = useState<string | null>(null);
+
   return (
-    <UserContext.Provider value={{ user, setUser }}>
+    <UserContext.Provider value={{ user, setUser, token, setToken }}>
       {children}
     </UserContext.Provider>
   );

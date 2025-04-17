@@ -8,7 +8,7 @@ import { useUser } from "../app/context/UserContext";
 WebBrowser.maybeCompleteAuthSession();
 
 export function useAuth() {
-  const [token, setToken] = useState<string | null>(null);
+  const { token, setToken, setUser } = useUser();
   const { user, setUser } = useUser();
   const useProxy = process.env.NODE_ENV !== "production";
 

@@ -1,101 +1,56 @@
 import React, { useState } from "react";
-import {
-  View,
-  Text,
-  StyleSheet,
-  Button,
-  TextInput,
-  Picker,
-} from "react-native";
-import { useRouter } from "expo-router";
-
-type Reward = {
-  title: string;
-  cost: number;
-  createdBy: string;
-  isRedeemed: boolean;
-  redeemedBy: string | null;
-};
+import { ScrollView, Text, View, StyleSheet } from "react-native";
+import RewardCardList from "./reward-cardlist";
+import AddRewardForm from "./add-rewards";
 
 export default function ParentRewardsScreen() {
-  const router = useRouter();
+  const [rewards, setRewards] = useState([
+    {
+      reward_id: "1",
+      title: "Extra Screen Time",
+      cost: 5,
+      isRedeemed: false,
+      createdBy: "parent1",
+    },
+    {
+      reward_id: "2",
+      title: "Trip to Park",
+      cost: 3,
+      isRedeemed: true,
+      createdBy: "parent1",
+    },
+  ]);
 
-  const [title, setTitle] = useState<string>("");
-  const [cost, setCost] = useState<string>("");
+  const handleAddReward = (title: string, cost: number) => {
+    const newReward = {
+      reward_id: (rewards.length + 1).toString(),
+      title,
+      cost,
+      isRedeemed: false,
+      createdBy: "parent1",
+    };
+    setRewards((prevRewards) => [...prevRewards, newReward]);
+  };
 
   return (
-    <View style={styles.container}>
-      <Text style={styles.heading}>Create a Reward</Text>
+    <ScrollView contentContainerStyle={styles.container}>
+      <Text style={styles.heading}>Rewards</Text>
+      <RewardCardList rewards={rewards} />
 
-      <TextInput
-        placeholder="Reward Title"
-        value={title}
-        onChangeText={setTitle}
-        style={styles.input}
-      />
-
-      <Text style={styles.label}>Select Cost:</Text>
-      <View style={styles.pickerContainer}>
-        <Picker
-          selectedValue={cost}
-          onValueChange={(itemValue) => setCost(itemValue)}
-          style={styles.picker}
-        >
-          {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map((value) => (
-            <Picker.Item key={value} label={`${value} ⭐ `} value={value} />
-          ))}
-        </Picker>
-      </View>
-
-      <View style={styles.buttonGroup}>
-        <Button title="Create Reward" />
-        <Button
-          title="Back to Dashboard"
-          onPress={() => router.push("/parent")}
-        />
-      </View>
-    </View>
+      <Text style={[styles.heading, { marginTop: 24 }]}>Create a Reward</Text>
+      <AddRewardForm onAddReward={handleAddReward} />
+    </ScrollView>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
-    flex: 1,
     padding: 24,
-    justifyContent: "center",
-    alignItems: "center",
     backgroundColor: "#fff",
   },
   heading: {
     fontSize: 24,
     fontWeight: "bold",
-  },
-  subtext: {
-    fontSize: 16,
-    marginTop: 12,
-    textAlign: "center",
-  },
-  buttonGroup: {
-    marginTop: 32,
-    gap: 16,
-  },
-  input: {
-    width: "100%",
-    borderWidth: 1,
-    borderColor: "#ccc",
-    padding: 12,
-    borderRadius: 8,
     marginBottom: 12,
-  },
-
-  pickerContainer: {
-    borderWidth: 1,
-    borderColor: "#ccc",
-    borderRadius: 8,
-    marginBottom: 24,
-  },
-  picker: {
-    height: 50,
-    width: "100%",
   },
 });

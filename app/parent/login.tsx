@@ -2,6 +2,7 @@ import React from "react";
 import { View, Text, Button, ScrollView } from "react-native";
 import { useAuth } from "../../hooks/useAuth";
 import { Link } from "expo-router";
+import Constants from "expo-constants";
 
 console.log("Auth0 domain:", Constants.expoConfig.extra.EXPO_PUBLIC_AUTH0_DOMAIN);
 

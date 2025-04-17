@@ -29,8 +29,6 @@ export function useAuth() {
     discovery
   );
 
-
-
   const login = () => {
     console.log("Auth0 domain:", authConfig.domain);
 
@@ -49,11 +47,14 @@ export function useAuth() {
 
     const fetchUserFromAPI = async () => {
       try {
-        const res = await fetch("https://be-star-step-app-1.onrender.com/api/user/me", {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        });
+        const res = await fetch(
+          "https://be-star-step-app-1.onrender.com/api/user/me",
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          }
+        );
 
         if (!res.ok) throw new Error("Failed to fetch user");
 

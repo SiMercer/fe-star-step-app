@@ -3,7 +3,7 @@ export default {
     name: "StarSteps",
     slug: "fe-star-step-app",
     version: "1.0.0",
-    sdkVersion: "EXPO_SDK_VERSION_HERE",
+    // sdkVersion: "EXPO_SDK_VERSION_HERE",
     platforms: ["ios", "android", "web"],
     extra: {
       auth0Domain: process.env.EXPO_PUBLIC_AUTH0_DOMAIN,

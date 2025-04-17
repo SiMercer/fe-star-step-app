@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { ScrollView, Text, View, StyleSheet, Button } from "react-native";
 import RewardCardList from "./reward-cardlist";
 import AddRewardForm from "./add-rewards";
+import { router } from "expo-router";
 
 export default function ParentRewardsScreen() {
   const [rewards, setRewards] = useState([

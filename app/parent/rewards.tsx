@@ -1,43 +1,56 @@
-import React from "react";
-import { View, Text, StyleSheet, Button } from "react-native";
-import { useRouter } from "expo-router";
+import React, { useState } from "react";
+import { ScrollView, Text, View, StyleSheet } from "react-native";
+import RewardCardList from "./reward-cardlist";
+import AddRewardForm from "./add-rewards";
 
 export default function ParentRewardsScreen() {
-  const router = useRouter();
+  const [rewards, setRewards] = useState([
+    {
+      reward_id: "1",
+      title: "Extra Screen Time",
+      cost: 5,
+      isRedeemed: false,
+      createdBy: "parent1",
+    },
+    {
+      reward_id: "2",
+      title: "Trip to Park",
+      cost: 3,
+      isRedeemed: true,
+      createdBy: "parent1",
+    },
+  ]);
+
+  const handleAddReward = (title: string, cost: number) => {
+    const newReward = {
+      reward_id: (rewards.length + 1).toString(),
+      title,
+      cost,
+      isRedeemed: false,
+      createdBy: "parent1",
+    };
+    setRewards((prevRewards) => [...prevRewards, newReward]);
+  };
 
   return (
-    <View style={styles.container}>
-      <Text style={styles.heading}>Rewards Title</Text>
-      <Text style={styles.subtext}>
-        Rewards.
-      </Text>
+    <ScrollView contentContainerStyle={styles.container}>
+      <Text style={styles.heading}>Rewards</Text>
+      <RewardCardList rewards={rewards} />
 
-      <View style={styles.buttonGroup}>
-        <Button title="Back to Dashboard" onPress={() => router.push("/parent")} />
-      </View>
-    </View>
+      <Text style={[styles.heading, { marginTop: 24 }]}>Create a Reward</Text>
+      <AddRewardForm onAddReward={handleAddReward} />
+    </ScrollView>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
-    flex: 1,
     padding: 24,
-    justifyContent: "center",
-    alignItems: "center",
     backgroundColor: "#fff",
   },
   heading: {
     fontSize: 24,
     fontWeight: "bold",
-  },
-  subtext: {
-    fontSize: 16,
-    marginTop: 12,
-    textAlign: "center",
-  },
-  buttonGroup: {
-    marginTop: 32,
-    gap: 16,
+    marginBottom: 12,
   },
 });

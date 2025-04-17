@@ -31,7 +31,7 @@ export function useAuth() {
 
   const login = () => {
     if (!request) return;
-    promptAsync({ useProxy: true });
+    promptAsync({ useProxy: authConfig.useProxy });
   };
 
   useEffect(() => {

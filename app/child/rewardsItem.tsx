@@ -1,12 +1,24 @@
 import { useState } from "react";
 import { Pressable, StyleSheet, Text, View } from "react-native";
 
-export default function ChildsRewardsItem() {
-  const [isRequested, setIsRequested] = useState(false);
+interface ItemBoxProps {
+  reward: {
+    reward_id: string;
+    title: string;
+    cost: number;
+    redeemedBy: string;
+    isRedeemed: boolean;
+    createdBy: string;
+  };
+}
+
+export default function ChildsRewardsItem({ reward }: ItemBoxProps) {
+  const [isRequested, setIsRequested] = useState(reward.isRedeemed);
   return (
     <View style={styles.default}>
-      <Text>Rewards text</Text>
-      <View style={{ alignItems: "flex-end" }}>
+      <Text style={{ width: "40%" }}>{reward.title}</Text>
+      <Text style={{ alignSelf: "center" }}>{reward.cost + "⭐"}</Text>
+      <View style={{ width: "40%", alignItems: "flex-end" }}>
         <Pressable
           style={{
             height: 24,
@@ -20,13 +32,13 @@ export default function ChildsRewardsItem() {
             setIsRequested(!isRequested);
           }}
         >
-          {isRequested ? (
-            <View style={styles.slide}></View>
-          ) : (
-            <View style={styles.slideRequested}></View>
-          )}
+          <View
+            style={isRequested ? styles.slide : styles.slideRequested}
+          ></View>
         </Pressable>
-        <View>{isRequested ? "Requested!" : "Request?"}</View>
+        <View>
+          <Text>{isRequested ? "Requested!" : "Request?"}</Text>
+        </View>
       </View>
     </View>
   );

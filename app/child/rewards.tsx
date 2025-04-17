@@ -1,16 +1,42 @@
-import { View, Text, Button } from "react-native";
+import { View, Text, Button, ActivityIndicator } from "react-native";
 import { Link } from "expo-router";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import ChildsRewardsItem from "./rewardsItem";
+import { getRewardsByParent } from "../../utils/api";
+
+interface Rewards {
+  reward_id: string;
+  title: string;
+  cost: number;
+  redeemedBy: string;
+  isRedeemed: boolean;
+  createdBy: string;
+}
 
 export default function ChildRewardsScreen() {
-  const [rewards, setRewards] = useState([]);
+  const [rewards, setRewards] = useState<Rewards[]>([]);
+  const [isLoading, setIsLoading] = useState<boolean>(true);
+  useEffect(() => {
+    setIsLoading(true);
+    getRewardsByParent("000000000000000000000001").then(
+      ({ rewards }: { rewards: Rewards[] }) => {
+        setRewards(rewards);
+        setIsLoading(false);
+      }
+    );
+  }, []);
   return (
     <View style={{ flex: 1, justifyContent: "space-between", padding: 20 }}>
       <Text style={{ fontSize: 24, marginTop: 20 }}>Rewards</Text>
-      <View style={{ height: "80%", justifyContent: "flex-start" }}>
-        <ChildsRewardsItem />
-      </View>
+      {!isLoading ? (
+        <View style={{ height: "80%", justifyContent: "flex-start" }}>
+          {rewards.map((reward: Rewards) => {
+            return <ChildsRewardsItem key={reward.reward_id} reward={reward} />;
+          })}
+        </View>
+      ) : (
+        <ActivityIndicator />
+      )}
       <View
         style={{
           flexDirection: "row",

@@ -1,20 +1,10 @@
 import { useState } from "react";
-import { Pressable, Text, View } from "react-native";
+import { Pressable, StyleSheet, Text, View } from "react-native";
 
 export default function ChildsRewardsItem() {
   const [isRequested, setIsRequested] = useState(false);
   return (
-    <View
-      style={{
-        width: "100%",
-        padding: 10,
-        borderWidth: 5,
-        borderColor: "#000",
-        flexDirection: "row",
-        justifyContent: "space-between",
-        alignItems: "center",
-      }}
-    >
+    <View style={styles.default}>
       <Text>Rewards text</Text>
       <View style={{ alignItems: "flex-end" }}>
         <Pressable
@@ -31,27 +21,9 @@ export default function ChildsRewardsItem() {
           }}
         >
           {isRequested ? (
-            <View
-              style={{
-                height: 12,
-                width: 12,
-                borderRadius: 6,
-                backgroundColor: "#000",
-                alignSelf: "flex-end",
-                margin: 5,
-              }}
-            ></View>
+            <View style={styles.slide}></View>
           ) : (
-            <View
-              style={{
-                height: 12,
-                width: 12,
-                borderRadius: 6,
-                backgroundColor: "#000",
-                alignSelf: "flex-start",
-                margin: 5,
-              }}
-            ></View>
+            <View style={styles.slideRequested}></View>
           )}
         </Pressable>
         <View>{isRequested ? "Requested!" : "Request?"}</View>
@@ -59,3 +31,40 @@ export default function ChildsRewardsItem() {
     </View>
   );
 }
+const styles = StyleSheet.create({
+  default: {
+    width: "100%",
+    padding: 10,
+    borderWidth: 5,
+    borderColor: "#000",
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+  },
+  redeemed: {
+    width: "100%",
+    padding: 10,
+    borderWidth: 5,
+    borderColor: "#000",
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    backgroundColor: "0f0",
+  },
+  slide: {
+    height: 12,
+    width: 12,
+    borderRadius: 6,
+    backgroundColor: "#000",
+    alignSelf: "flex-end",
+    margin: 5,
+  },
+  slideRequested: {
+    height: 12,
+    width: 12,
+    borderRadius: 6,
+    backgroundColor: "#000",
+    alignSelf: "flex-start",
+    margin: 5,
+  },
+});

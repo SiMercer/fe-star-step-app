@@ -87,7 +87,7 @@ export function useAuth() {
         const userInfo = await userRes.json();
 
 
-        const parentRes = await fetch("https://be-star-step-app-dev.onrender.com/parents", {
+        const parentRes = await fetch("https://be-star-step-app-dev.onrender.com/api/parents", {
           method: "POST",
           headers: {
             "Content-Type": "application/json",

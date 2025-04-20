@@ -23,7 +23,7 @@ const discovery = {
 
 export default function LoginScreen() {
   const redirectUri = makeRedirectUri({
-    useProxy: true, // makes this work on Expo Go and Web!
+    useProxy: true,
   });
 
   const [request, response, promptAsync] = useAuthRequest(
@@ -53,7 +53,6 @@ export default function LoginScreen() {
         const userInfo = await userInfoRes.json();
         console.log("User Info:", userInfo);
 
-        // Register the parent in your backend
         const res = await fetch("https://be-star-step-app-dev.onrender.com/api/parents", {
           method: "POST",
           headers: { "Content-Type": "application/json" },

@@ -79,14 +79,15 @@ export default function LoginScreen() {
 
   return (
     <View>
-      <Button
-        title="Login"
-        onPress={() => {
-          console.log("Prompting login...");
-          promptAsync();
-        }}
-        disabled={!request}
-      />
+<Button
+  title="Login"
+  onPress={async () => {
+    console.log("Prompting login...");
+    const result = await promptAsync();
+    console.log("Prompt result:", result);
+  }}
+  disabled={!request}
+/>
     </View>
   );
 }

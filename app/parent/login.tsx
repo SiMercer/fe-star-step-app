@@ -81,7 +81,7 @@ export default function LoginScreen() {
         }
       }
     };
-
+    console.log("Resolved Redirect URI:", redirectUri);
     handleAuth();
   }, [response]);
 

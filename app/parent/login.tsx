@@ -1,6 +1,6 @@
 import React from "react";
 import { Button, View } from "react-native";
-import { startAsync } from "expo-auth-session"; // ✅ fixed import
+import * as AuthSession from "expo-auth-session"; // ✅ correct import style
 import Constants from "expo-constants";
 
 const {
@@ -23,9 +23,8 @@ export default function LoginScreen() {
       `&scope=openid%20profile%20email&audience=${auth0Audience}`;
 
     try {
-      const result = await startAsync({ authUrl }); // ✅ direct call
+      const result = await AuthSession.startAsync({ authUrl }); // ✅ works with this import
       console.log("Auth result:", result);
-      // TODO: store access token, fetch user profile, etc.
     } catch (err) {
       console.error("Login error:", err);
     }

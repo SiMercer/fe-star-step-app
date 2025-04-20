@@ -20,9 +20,7 @@ const discovery = {
 };
 
 export default function LoginScreen() {
-  const redirectUri = makeRedirectUri({
-    useProxy: true,
-  });
+  const redirectUri = "https://starsteps.netlify.app";
 
   const [request, response, promptAsync] = useAuthRequest(
     {
@@ -79,15 +77,15 @@ export default function LoginScreen() {
 
   return (
     <View>
-<Button
-  title="Login"
-  onPress={async () => {
-    console.log("Prompting login...");
-    const result = await promptAsync();
-    console.log("Prompt result:", result);
-  }}
-  disabled={!request}
-/>
+      <Button
+        title="Login"
+        onPress={async () => {
+          console.log("Prompting login...");
+          const result = await promptAsync();
+          console.log("Prompt result:", result);
+        }}
+        disabled={!request}
+      />
     </View>
   );
 }

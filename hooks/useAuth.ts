@@ -79,7 +79,7 @@ export function useAuth() {
     const fetchAndSyncUser = async () => {
       try {
 
-        const userRes = await fetch("https://be-star-step-app-1.onrender.com/api/user/me", {
+        const userRes = await fetch("https://be-star-step-app-dev.onrender.com//user/me", {
           headers: { Authorization: `Bearer ${token}` },
         });
 
@@ -87,7 +87,7 @@ export function useAuth() {
         const userInfo = await userRes.json();
 
 
-        const parentRes = await fetch("https://be-star-step-app-1.onrender.com/api/parents", {
+        const parentRes = await fetch("https://be-star-step-app-dev.onrender.com/parents", {
           method: "POST",
           headers: {
             "Content-Type": "application/json",

@@ -38,6 +38,14 @@ export default function LoginScreen() {
   );
 
   useEffect(() => {
+
+    const redirectUri = makeRedirectUri({
+      useProxy: true,
+    });
+    
+    console.log("Redirect URI:", redirectUri);
+
+
     const handleAuth = async () => {
       if (response?.type === "success") {
         const { access_token } = response.params;
@@ -77,11 +85,7 @@ export default function LoginScreen() {
     handleAuth();
   }, [response]);
 
-  const redirectUri = makeRedirectUri({
-    useProxy: true,
-  });
-  
-  console.log("Redirect URI:", redirectUri);
+
 
 
 

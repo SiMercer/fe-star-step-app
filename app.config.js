@@ -2,6 +2,7 @@ export default {
   expo: {
     name: "StarSteps",
     slug: "fe-star-step-app",
+    owner: "simercer",
     version: "1.0.0",
     platforms: ["ios", "android", "web"],
     plugins: ["expo-secure-store"],

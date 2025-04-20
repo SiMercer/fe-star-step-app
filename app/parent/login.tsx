@@ -3,8 +3,8 @@ import { Button, View, Alert } from "react-native";
 import Constants from "expo-constants";
 import {
   useAuthRequest,
-  makeRedirectUri,
   ResponseType,
+  makeRedirectUri,
 } from "expo-auth-session";
 
 const {
@@ -21,6 +21,7 @@ const discovery = {
 
 export default function LoginScreen() {
   const redirectUri = makeRedirectUri({
+    native: "com.starsteps://redirect", // optional for mobile
     useProxy: true,
   });
 
@@ -38,14 +39,6 @@ export default function LoginScreen() {
   );
 
   useEffect(() => {
-
-    const redirectUri = makeRedirectUri({
-      useProxy: true,
-    });
-    
-    console.log("Redirect URI:", redirectUri);
-
-
     const handleAuth = async () => {
       if (response?.type === "success") {
         const { access_token } = response.params;
@@ -81,13 +74,9 @@ export default function LoginScreen() {
         }
       }
     };
-    console.log("Resolved Redirect URI:", redirectUri);
+
     handleAuth();
   }, [response]);
-
-
-
-
 
   return (
     <View>

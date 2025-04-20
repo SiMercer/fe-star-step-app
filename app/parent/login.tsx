@@ -77,6 +77,14 @@ export default function LoginScreen() {
     handleAuth();
   }, [response]);
 
+  const redirectUri = makeRedirectUri({
+    useProxy: true,
+  });
+  
+  console.log("Redirect URI:", redirectUri);
+
+
+
   return (
     <View>
       <Button

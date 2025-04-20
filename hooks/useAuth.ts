@@ -38,6 +38,7 @@ export const AuthProvider = ({ children }) => {
   );
 
   useEffect(() => {
+    console.log("Auth response object:", response);
     const handleAuth = async () => {
       if (response?.type === "success") {
         const token = response.params.access_token;
@@ -67,7 +68,7 @@ export const AuthProvider = ({ children }) => {
   
     handleAuth();
   }, [response]);
-
+  console.log("useAuth.ts mounted");
   return (
     <AuthContext.Provider value={{ parent, promptLogin: promptAsync, isLoading: !response && !parent }}>
       {children}

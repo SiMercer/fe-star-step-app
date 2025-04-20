@@ -10,6 +10,7 @@ export default {
       auth0ClientId: process.env.EXPO_PUBLIC_AUTH0_CLIENT_ID,
       auth0Audience: process.env.EXPO_PUBLIC_AUTH0_AUDIENCE,
       redirectUri: process.env.EXPO_PUBLIC_REDIRECT_URI,
+    },
     web: {
       bundler: "metro",
     },

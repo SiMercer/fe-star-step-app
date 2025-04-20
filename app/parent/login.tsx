@@ -1,63 +1,86 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { Button, View, Alert } from "react-native";
 import Constants from "expo-constants";
-import { startAsync } from "expo-auth-session/build/AuthSession"; // ✅ direct path import
+import {
+  useAuthRequest,
+  makeRedirectUri,
+  ResponseType,
+  exchangeCodeAsync,
+  fetchUserInfoAsync,
+} from "expo-auth-session";
 
 const {
   auth0Domain,
   auth0ClientId,
   auth0Audience,
-  redirectUri,
 } = Constants.expoConfig.extra;
 
+const discovery = {
+  authorizationEndpoint: `https://${auth0Domain}/authorize`,
+  tokenEndpoint: `https://${auth0Domain}/oauth/token`,
+  revocationEndpoint: `https://${auth0Domain}/oauth/revoke`,
+};
+
 export default function LoginScreen() {
-  const handleLogin = async () => {
-    const authUrl = `https://${auth0Domain}/authorize?client_id=${auth0ClientId}` +
-      `&response_type=token&redirect_uri=${encodeURIComponent(redirectUri)}` +
-      `&scope=openid%20profile%20email&audience=${auth0Audience}`;
+  const redirectUri = makeRedirectUri({
+    useProxy: true, // makes this work on Expo Go and Web!
+  });
 
-    try {
-      const result = await startAsync({ authUrl });
-      console.log("Auth result:", result);
+  const [request, response, promptAsync] = useAuthRequest(
+    {
+      clientId: auth0ClientId,
+      responseType: ResponseType.Token,
+      scopes: ["openid", "profile", "email"],
+      redirectUri,
+      extraParams: {
+        audience: auth0Audience,
+      },
+    },
+    discovery
+  );
 
-      if (result.type === "success") {
-        const accessToken = result.params.access_token;
+  useEffect(() => {
+    const handleAuth = async () => {
+      if (response?.type === "success") {
+        const { access_token } = response.params;
 
         const userInfoRes = await fetch(`https://${auth0Domain}/userinfo`, {
           headers: {
-            Authorization: `Bearer ${accessToken}`,
+            Authorization: `Bearer ${access_token}`,
           },
         });
 
         const userInfo = await userInfoRes.json();
-        console.log("User info:", userInfo);
+        console.log("User Info:", userInfo);
 
-        const registerRes = await fetch("https://be-star-step-app-dev.onrender.com/api/parents", {
+        // Register the parent in your backend
+        const res = await fetch("https://be-star-step-app-dev.onrender.com/api/parents", {
           method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
+          headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
             auth0Id: userInfo.sub,
             parentName: userInfo.name || "Unnamed Parent",
           }),
         });
 
-        if (!registerRes.ok) throw new Error("Failed to register parent");
-
-        const parent = await registerRes.json();
-        console.log("Parent registered:", parent);
+        if (!res.ok) throw new Error("Failed to register user");
+        const parent = await res.json();
         Alert.alert("Welcome", `Logged in as ${parent.parentName}`);
       }
-    } catch (err) {
-      console.error("Login error:", err);
-      Alert.alert("Login failed", err.message);
-    }
-  };
+    };
+
+    handleAuth();
+  }, [response]);
 
   return (
     <View>
-      <Button title="Log In" onPress={handleLogin} />
+      <Button
+        title="Log In"
+        disabled={!request}
+        onPress={() => {
+          promptAsync();
+        }}
+      />
     </View>
   );
 }

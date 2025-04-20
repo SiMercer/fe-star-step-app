@@ -1,4 +1,3 @@
-// ✅ Refactored useAuth.ts using Expo AuthSession, user context and MongoDB sync
 import React, { createContext, useContext, useEffect, useState } from "react";
 import Constants from "expo-constants";
 import {
@@ -43,14 +42,15 @@ export const AuthProvider = ({ children }) => {
       if (response?.type === "success") {
         const token = response.params.access_token;
         setAccessToken(token);
-
+  
         const userRes = await fetch(`https://${auth0Domain}/userinfo`, {
           headers: {
             Authorization: `Bearer ${token}`,
           },
         });
-
+  
         const userInfo = await userRes.json();
+  
         const registerRes = await fetch("https://be-star-step-app-dev.onrender.com/api/parents", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
@@ -59,11 +59,12 @@ export const AuthProvider = ({ children }) => {
             parentName: userInfo.name || "Unnamed Parent",
           }),
         });
-
+  
         const parentData = await registerRes.json();
         setParent(parentData);
       }
     };
+  
     handleAuth();
   }, [response]);
 

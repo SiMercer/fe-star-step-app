@@ -20,7 +20,9 @@ const discovery = {
 };
 
 export default function LoginScreen() {
-  const redirectUri = "https://starsteps.netlify.app";
+  const redirectUri = makeRedirectUri({
+    useProxy: true,
+  });
 
   const [request, response, promptAsync] = useAuthRequest(
     {

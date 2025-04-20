@@ -1,45 +1,35 @@
 import React from "react";
-import { View, Text, Button, ScrollView } from "react-native";
-import { useAuth } from "../../hooks/useAuth";
-import { Link } from "expo-router";
+import { Button, View } from "react-native";
+import * as AuthSession from "expo-auth-session";
 import Constants from "expo-constants";
 
-console.log("Auth0 domain:", Constants.expoConfig.extra.EXPO_PUBLIC_AUTH0_DOMAIN);
+const {
+  auth0Domain,
+  auth0ClientId,
+  auth0Audience,
+  redirectUri,
+} = Constants.expoConfig.extra;
 
-const domain = Constants.expoConfig.extra.auth0Domain;
+const discovery = {
+  authorizationEndpoint: `https://${auth0Domain}/authorize`,
+  tokenEndpoint: `https://${auth0Domain}/oauth/token`,
+  revocationEndpoint: `https://${auth0Domain}/oauth/revoke`,
+};
 
-export default function ParentLoginScreen() {
-  const { login, token, user } = useAuth();
+export default function LoginScreen() {
+  const handleLogin = async () => {
+    const authUrl = `https://${auth0Domain}/authorize?client_id=${auth0ClientId}` +
+      `&response_type=token&redirect_uri=${encodeURIComponent(redirectUri)}` +
+      `&scope=openid%20profile%20email&audience=${auth0Audience}`;
+
+    const result = await AuthSession.startAsync({ authUrl });
+    console.log("Auth result:", result);
+    // handle storing token, fetching user, etc.
+  };
 
   return (
-    <ScrollView contentContainerStyle={{ flexGrow: 1, justifyContent: "center", alignItems: "center", padding: 20 }}>
-      <Text style={{ fontSize: 24, marginBottom: 20 }}>Parent Login</Text>
-      <View style={{ marginBottom: 30 }}>
-        <Link href="/" asChild>
-          <Button title="Back" />
-        </Link>
-        </View>
-
-      <Button title="Login with Auth0" onPress={login} />
-
-      <Text style={{ marginTop: 20, fontWeight: "bold" }}>Token:</Text>
-      <Text selectable style={{ marginVertical: 10, fontSize: 12 }}>
-        {token ? token : "No token yet"}
-      </Text>
-
-      <Text style={{ marginTop: 20, fontWeight: "bold" }}>User Info:</Text>
-      <Text selectable style={{ fontSize: 12 }}>
-        {user ? JSON.stringify(user, null, 2) : "No user info yet"}
-      </Text>
-
-      <View style={{ marginTop: 30 }}>
-
-
-        <Link href="/parent" asChild>
-          <Button title="parent dashboard" />
-        </Link>
-      </View>
-
-    </ScrollView>
+    <View>
+      <Button title="Log In" onPress={handleLogin} />
+    </View>
   );
 }

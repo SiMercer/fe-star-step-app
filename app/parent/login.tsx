@@ -6,6 +6,7 @@ import Constants from "expo-constants";
 
 console.log("Auth0 domain:", Constants.expoConfig.extra.EXPO_PUBLIC_AUTH0_DOMAIN);
 
+const domain = Constants.expoConfig.extra.auth0Domain;
 
 export default function ParentLoginScreen() {
   const { login, token, user } = useAuth();

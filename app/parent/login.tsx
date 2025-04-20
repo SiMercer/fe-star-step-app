@@ -5,8 +5,6 @@ import {
   useAuthRequest,
   makeRedirectUri,
   ResponseType,
-  exchangeCodeAsync,
-  fetchUserInfoAsync,
 } from "expo-auth-session";
 
 const {
@@ -44,27 +42,35 @@ export default function LoginScreen() {
       if (response?.type === "success") {
         const { access_token } = response.params;
 
-        const userInfoRes = await fetch(`https://${auth0Domain}/userinfo`, {
-          headers: {
-            Authorization: `Bearer ${access_token}`,
-          },
-        });
+        try {
+          const userInfoRes = await fetch(`https://${auth0Domain}/userinfo`, {
+            headers: {
+              Authorization: `Bearer ${access_token}`,
+            },
+          });
 
-        const userInfo = await userInfoRes.json();
-        console.log("User Info:", userInfo);
+          const userInfo = await userInfoRes.json();
+          console.log("User Info:", userInfo);
 
-        const res = await fetch("https://be-star-step-app-dev.onrender.com/api/parents", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            auth0Id: userInfo.sub,
-            parentName: userInfo.name || "Unnamed Parent",
-          }),
-        });
+          const res = await fetch("https://be-star-step-app-dev.onrender.com/api/parents", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              auth0Id: userInfo.sub,
+              parentName: userInfo.name || "Unnamed Parent",
+            }),
+          });
 
-        if (!res.ok) throw new Error("Failed to register user");
-        const parent = await res.json();
-        Alert.alert("Welcome", `Logged in as ${parent.parentName}`);
+          const result = await res.json();
+          console.log("Registration Response:", result);
+
+          if (!res.ok) throw new Error(result.msg || "Failed to register");
+
+          Alert.alert("Welcome", `Logged in as ${result.parentName}`);
+        } catch (err) {
+          console.error("Registration/Login failed:", err);
+          Alert.alert("Error", err.message);
+        }
       }
     };
 
@@ -73,14 +79,14 @@ export default function LoginScreen() {
 
   return (
     <View>
-<Button
-  title="Login"
-  onPress={async () => {
-    console.log("🟢 Prompting login...");
-    const result = await promptLogin();
-    console.log("🟢 Prompt result:", result);
-  }}
-/>
+      <Button
+        title="Login"
+        onPress={() => {
+          console.log("Prompting login...");
+          promptAsync();
+        }}
+        disabled={!request}
+      />
     </View>
   );
 }

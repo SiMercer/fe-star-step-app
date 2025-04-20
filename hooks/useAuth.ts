@@ -79,7 +79,7 @@ export function useAuth() {
     const fetchAndSyncUser = async () => {
       try {
 
-        const userRes = await fetch("https://be-star-step-app-dev.onrender.com/user/me", {
+        const userRes = await fetch("https://be-star-step-app-dev.onrender.com/api/user/me", {
           headers: { Authorization: `Bearer ${token}` },
         });
 

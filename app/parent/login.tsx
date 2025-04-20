@@ -1,7 +1,7 @@
 import React from "react";
 import { Button, View, Alert } from "react-native";
-import * as AuthSession from "expo-auth-session";
 import Constants from "expo-constants";
+import { startAsync } from "expo-auth-session/build/AuthSession"; // ✅ direct path import
 
 const {
   auth0Domain,
@@ -10,12 +10,6 @@ const {
   redirectUri,
 } = Constants.expoConfig.extra;
 
-const discovery = {
-  authorizationEndpoint: `https://${auth0Domain}/authorize`,
-  tokenEndpoint: `https://${auth0Domain}/oauth/token`,
-  revocationEndpoint: `https://${auth0Domain}/oauth/revoke`,
-};
-
 export default function LoginScreen() {
   const handleLogin = async () => {
     const authUrl = `https://${auth0Domain}/authorize?client_id=${auth0ClientId}` +
@@ -23,12 +17,12 @@ export default function LoginScreen() {
       `&scope=openid%20profile%20email&audience=${auth0Audience}`;
 
     try {
-      const result = await AuthSession.startAsync({ authUrl });
+      const result = await startAsync({ authUrl });
+      console.log("Auth result:", result);
 
       if (result.type === "success") {
         const accessToken = result.params.access_token;
 
-        // Fetch user profile from Auth0
         const userInfoRes = await fetch(`https://${auth0Domain}/userinfo`, {
           headers: {
             Authorization: `Bearer ${accessToken}`,
@@ -36,9 +30,8 @@ export default function LoginScreen() {
         });
 
         const userInfo = await userInfoRes.json();
-        console.log("UserInfo:", userInfo);
+        console.log("User info:", userInfo);
 
-        // Register or fetch parent from MongoDB backend
         const registerRes = await fetch("https://be-star-step-app-dev.onrender.com/api/parents", {
           method: "POST",
           headers: {
@@ -50,19 +43,15 @@ export default function LoginScreen() {
           }),
         });
 
-        if (!registerRes.ok) {
-          throw new Error("Failed to register parent");
-        }
+        if (!registerRes.ok) throw new Error("Failed to register parent");
 
         const parent = await registerRes.json();
-        console.log("Registered Parent:", parent);
+        console.log("Parent registered:", parent);
         Alert.alert("Welcome", `Logged in as ${parent.parentName}`);
-      } else {
-        console.warn("Auth session not successful:", result);
       }
     } catch (err) {
       console.error("Login error:", err);
-      Alert.alert("Error", "Login failed. Please try again.");
+      Alert.alert("Login failed", err.message);
     }
   };
 

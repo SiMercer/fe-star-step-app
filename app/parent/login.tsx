@@ -1,88 +1,80 @@
+
 import React, { useEffect } from 'react';
-import { Button, View, Alert } from 'react-native';
-import Constants from 'expo-constants';
-import {
-  useAuthRequest,
-  ResponseType,
-} from 'expo-auth-session';
+import { Button, View, ActivityIndicator, Alert } from 'react-native';
+import { useAuth0 } from '@auth0/auth0-react';
 
-const {
-  auth0Domain,
-  auth0ClientId,
-  auth0Audience,
-  redirectUri,    // should be "https://starsteps.netlify.app/auth-callback.html"
-} = Constants.expoConfig.extra;
+export default function ParentLogin() {
+  const {
+    loginWithRedirect,
+    isAuthenticated,
+    user,
+    getAccessTokenSilently,
+    error,
+    isLoading,
+  } = useAuth0();
 
-const discovery = {
-  authorizationEndpoint: `https://${auth0Domain}/authorize`,
-  tokenEndpoint:       `https://${auth0Domain}/oauth/token`,
-  revocationEndpoint:  `https://${auth0Domain}/oauth/revoke`,
-};
-
-export default function LoginScreen() {
-  // 2) Pass `{ useProxy: false }` as the 3rd arg to useAuthRequest
-  const [request, response, promptAsync] = useAuthRequest(
-    {
-      clientId:     auth0ClientId,
-      responseType: ResponseType.Token,
-      scopes:       ['openid', 'profile', 'email'],
-      redirectUri,               // your static callback.html
-      extraParams: { audience: auth0Audience },
-    },
-    discovery,
-    { useProxy: false }        // ← important for direct‑web flow
-  );
 
   useEffect(() => {
-    console.log('Auth response:', response);
-    if (response?.type === 'success') {
-      const { access_token } = response.params;
+    if (isAuthenticated && user) {
       (async () => {
         try {
-          const userInfoRes = await fetch(`https://${auth0Domain}/userinfo`, {
-            headers: { Authorization: `Bearer ${access_token}` },
-          });
-          const userInfo = await userInfoRes.json();
-          console.log('UserInfo:', userInfo);
-
-          const backendRes = await fetch(
+          const token = await getAccessTokenSilently();
+          const res = await fetch(
             'https://be-star-step-app-dev.onrender.com/api/parents',
             {
               method: 'POST',
-              headers: { 'Content-Type': 'application/json' },
+              headers: {
+                'Content-Type': 'application/json',
+                Authorization: `Bearer ${token}`,
+              },
               body: JSON.stringify({
-                auth0Id:     userInfo.sub,
-                parentName: userInfo.name ?? 'Unnamed Parent',
+                auth0Id: user.sub,
+                parentName: user.name || 'Unnamed Parent',
               }),
             }
           );
-          const result = await backendRes.json();
-          console.log('Backend response:', result);
-
-          if (!backendRes.ok) {
-            throw new Error(result.msg || 'Registration failed');
-          }
-          Alert.alert('Welcome', `Logged in as ${result.parentName}`);
-        } catch (err) {
-          console.error('Login/register error:', err);
-          Alert.alert('Error', err.message);
+          const body = await res.json();
+          if (!res.ok) throw new Error(body.msg || 'Registration failed');
+          Alert.alert('Welcome', `Logged in as ${body.parentName}`);
+        } catch (e) {
+          console.error(e);
+          Alert.alert('Error', e.message);
         }
       })();
     }
-  }, [response]);
+  }, [isAuthenticated, user]);
+
+  if (isLoading) {
+    return (
+      <View style={{flex:1,justifyContent:'center'}}>
+        <ActivityIndicator />
+      </View>
+    );
+  }
+
+  if (error) {
+    return (
+      <View style={{flex:1,justifyContent:'center',padding:16}}>
+        <Button title="Retry Login" onPress={() => loginWithRedirect()} />
+        <Alert title="Error" message={error.message} />
+      </View>
+    );
+  }
+
+  if (!isAuthenticated) {
+    return (
+      <View style={{flex:1,justifyContent:'center',padding:16}}>
+        <Button
+          title="Log in / Register"
+          onPress={() => loginWithRedirect()}
+        />
+      </View>
+    );
+  }
 
   return (
-    <View style={{ flex:1, justifyContent:'center', padding:16 }}>
-      <Button
-        title="Login"
-        disabled={!request}
-        onPress={async () => {
-          console.log('Calling promptAsync()');
-          // also explicitly disable proxy here
-          const result = await promptAsync({ useProxy: false });
-          console.log('promptAsync result:', result);
-        }}
-      />
+    <View style={{flex:1,justifyContent:'center',padding:16}}>
+      <Button title="You’re logged in!" onPress={() => {}} />
     </View>
   );
 }

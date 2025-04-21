@@ -1,79 +1,93 @@
-import React, { createContext, useContext, useEffect, useState } from "react";
-import Constants from "expo-constants";
-import {
-  useAuthRequest,
-  makeRedirectUri,
-  ResponseType,
-} from "expo-auth-session";
+import React, { createContext, useContext, useEffect, useState, ReactNode } from 'react';
+import { useAuth0, User } from '@auth0/auth0-react';
 
-const {
-  auth0Domain,
-  auth0ClientId,
-  auth0Audience,
-} = Constants.expoConfig.extra;
+interface Parent {
+  _id: string;
+  parentName: string;
+}
 
-const AuthContext = createContext(null);
+interface AuthContextProps {
+  parent: Parent | null;
+  login: () => Promise<void>;
+  logout: () => void;
+  isLoading: boolean;
+}
 
-export const AuthProvider = ({ children }) => {
-  const redirectUri = makeRedirectUri({ useProxy: true });
+const AuthContext = createContext<AuthContextProps | undefined>(undefined);
 
-  const [parent, setParent] = useState(null);
-  const [accessToken, setAccessToken] = useState(null);
+export const AuthProvider = ({ children }: { children: ReactNode }) => {
+  const {
+    loginWithRedirect,
+    logout: auth0Logout,
+    isLoading: auth0Loading,
+    isAuthenticated,
+    user,
+    getAccessTokenSilently,
+  } = useAuth0();
 
-  const [request, response, promptAsync] = useAuthRequest(
-    {
-      clientId: auth0ClientId,
-      responseType: ResponseType.Token,
-      scopes: ["openid", "profile", "email"],
-      redirectUri,
-      extraParams: {
-        audience: auth0Audience,
-      },
-    },
-    {
-      authorizationEndpoint: `https://${auth0Domain}/authorize`,
-      tokenEndpoint: `https://${auth0Domain}/oauth/token`,
-      revocationEndpoint: `https://${auth0Domain}/oauth/revoke`,
-    }
-  );
+  const [parent, setParent] = useState<Parent | null>(null);
+  const [isLoading, setIsLoading] = useState<boolean>(auth0Loading);
 
   useEffect(() => {
-    console.log("Auth response object:", response);
-    const handleAuth = async () => {
-      if (response?.type === "success") {
-        const token = response.params.access_token;
-        setAccessToken(token);
-  
-        const userRes = await fetch(`https://${auth0Domain}/userinfo`, {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        });
-  
-        const userInfo = await userRes.json();
-  
-        const registerRes = await fetch("https://be-star-step-app-dev.onrender.com/api/parents", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            auth0Id: userInfo.sub,
-            parentName: userInfo.name || "Unnamed Parent",
-          }),
-        });
-  
-        const parentData = await registerRes.json();
-        setParent(parentData);
+    const registerParent = async () => {
+      if (isAuthenticated && user) {
+        setIsLoading(true);
+        try {
+          const token = await getAccessTokenSilently();
+          const res = await fetch(
+            'https://be-star-step-app-dev.onrender.com/api/parents',
+            {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json',
+                Authorization: `Bearer ${token}`,
+              },
+              body: JSON.stringify({
+                auth0Id: user.sub,
+                parentName: user.name || 'Unnamed Parent',
+              }),
+            }
+          );
+          const data = await res.json();
+          if (res.ok) {
+            setParent(data);
+          } else {
+            console.error('Registration error:', data.msg || data);
+          }
+        } catch (err) {
+          console.error('Error registering parent:', err);
+        } finally {
+          setIsLoading(false);
+        }
       }
     };
-  
-    handleAuth();
-  }, [response]);
-  console.log("useAuth.ts mounted");
+
+    registerParent();
+  }, [isAuthenticated, user, getAccessTokenSilently]);
+
+  const login = async () => {
+    await loginWithRedirect();
+  };
+
+  const logout = () => {
+    auth0Logout({ returnTo: window.location.origin });
+    setParent(null);
+  };
+
   return (
-    <AuthContext.Provider value={{ parent, promptLogin: promptAsync, isLoading: !response && !parent }}>
+    <AuthContext.Provider value={{ parent, login, logout, isLoading }}>
       {children}
     </AuthContext.Provider>
   );
 };
 
-export const useAuth = () => useContext(AuthContext);
+/**
+ * Hook to access auth context
+ */
+export const useAuth = (): AuthContextProps => {
+  const context = useContext(AuthContext);
+  if (!context) {
+    throw new Error('useAuth must be used within an AuthProvider');
+  }
+  return context;
+};

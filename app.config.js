@@ -1,6 +1,6 @@
 export default {
   expo: {
-    owner: "simercer",
+    owner: "simercer", // your Expo username
     name: "StarSteps",
     slug: "fe-star-step-app",
     version: "1.0.0",
@@ -10,10 +10,13 @@ export default {
       auth0Domain: process.env.EXPO_PUBLIC_AUTH0_DOMAIN,
       auth0ClientId: process.env.EXPO_PUBLIC_AUTH0_CLIENT_ID,
       auth0Audience: process.env.EXPO_PUBLIC_AUTH0_AUDIENCE,
+      // direct‐web callback page
       redirectUri: "https://starsteps.netlify.app/auth-callback.html",
       eas: { projectId: "c8a1b3ad-3dc4-42fc-a90d-0625eeec160f" },
     },
-    updates: { url: "https://u.expo.dev/c8a1b3ad-3dc4-42fc-a90d-0625eeec160f" },
+    updates: {
+      url: "https://u.expo.dev/c8a1b3ad-3dc4-42fc-a90d-0625eeec160f",
+    },
     runtimeVersion: { policy: "appVersion" },
     web: { bundler: "metro" },
   },

@@ -6,13 +6,17 @@
   </head>
   <body>
     <script>
-      // send the full URL (including #access_token=…) back to the opener window
-      window.opener.postMessage(
-        { type: "expo-auth-session", url: window.location.href },
-        window.location.origin
-      );
-      // then close the popup
-      window.close();
+      // Only run if opened as a popup
+      if (window.opener) {
+        // Send the full URL (with #access_token…) back to the opener
+        window.opener.postMessage(
+          { type: "expo-auth-session", url: window.location.href },
+          "*" // allow any origin
+        );
+        window.close(); // close the popup
+      } else {
+        document.body.innerText = "No opener window found";
+      }
     </script>
   </body>
 </html>

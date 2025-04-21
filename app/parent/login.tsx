@@ -10,7 +10,7 @@ const {
   auth0Domain,
   auth0ClientId,
   auth0Audience,
-  redirectUri,
+  redirectUri, // we’ll inject this from app.config.js
 } = Constants.expoConfig.extra;
 
 const discovery = {
@@ -25,46 +25,49 @@ export default function LoginScreen() {
       clientId: auth0ClientId,
       responseType: ResponseType.Token,
       scopes: ["openid", "profile", "email"],
-      redirectUri,               // now points at https://starsteps.netlify.app
+      redirectUri,              // will be https://starsteps.netlify.app/auth-callback.html
       extraParams: { audience: auth0Audience },
     },
     discovery
   );
 
   useEffect(() => {
-    async function handleAuth() {
-      if (response?.type === "success") {
-        const { access_token } = response.params;
+    if (response?.type === "success") {
+      const { access_token } = response.params;
+      (async () => {
         try {
-          const userInfoRes = await fetch(`https://${auth0Domain}/userinfo`, {
-            headers: { Authorization: `Bearer ${access_token}` },
-          });
-          const userInfo = await userInfoRes.json();
+          // fetch user from Auth0
+          const ui = await (
+            await fetch(`https://${auth0Domain}/userinfo`, {
+              headers: { Authorization: `Bearer ${access_token}` },
+            })
+          ).json();
+          console.log("User Info:", ui);
 
-          const backendRes = await fetch(
-            "https://be-star-step-app-dev.onrender.com/api/parents",
-            {
-              method: "POST",
-              headers: { "Content-Type": "application/json" },
-              body: JSON.stringify({
-                auth0Id: userInfo.sub,
-                parentName: userInfo.name || "Unnamed Parent",
-              }),
-            }
-          );
-          const result = await backendRes.json();
+          // register with your backend
+          const br = await (
+            await fetch(
+              "https://be-star-step-app-dev.onrender.com/api/parents",
+              {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({
+                  auth0Id: ui.sub,
+                  parentName: ui.name || "Unnamed Parent",
+                }),
+              }
+            )
+          ).json();
+          console.log("Backend response:", br);
 
-          if (!backendRes.ok) {
-            throw new Error(result.msg || "Failed to register parent");
-          }
-          Alert.alert("Welcome", `Logged in as ${result.parentName}`);
-        } catch (err) {
-          console.error("Login/register error:", err);
-          Alert.alert("Error", err.message);
+          if (!br._id) throw new Error(br.msg || "Registration failed");
+          Alert.alert("Welcome", `Logged in as ${br.parentName}`);
+        } catch (e) {
+          console.error(e);
+          Alert.alert("Error", e.message);
         }
-      }
+      })();
     }
-    handleAuth();
   }, [response]);
 
   return (
@@ -72,9 +75,7 @@ export default function LoginScreen() {
       <Button
         title="Login"
         disabled={!request}
-        onPress={() => {
-          promptAsync();
-        }}
+        onPress={() => promptAsync()}
       />
     </View>
   );

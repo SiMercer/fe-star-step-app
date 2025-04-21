@@ -6,17 +6,19 @@
   </head>
   <body>
     <script>
-      // Only run if opened as a popup
-      if (window.opener) {
-        // Send the full URL (with #access_token…) back to the opener
+      (function () {
+        if (!window.opener) {
+          document.body.innerText = "No opener window found";
+          return;
+        }
+        // Post message to the opener (main window). Use the same origin.
         window.opener.postMessage(
           { type: "expo-auth-session", url: window.location.href },
-          "*" // allow any origin
+          window.location.origin
         );
-        window.close(); // close the popup
-      } else {
-        document.body.innerText = "No opener window found";
-      }
+        // Give the message a moment to be dispatched, then close.
+        setTimeout(() => window.close(), 200);
+      })();
     </script>
   </body>
 </html>

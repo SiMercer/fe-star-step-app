@@ -1,3 +1,11 @@
+import * as WebBrowser from 'expo-web-browser';
+
+window.addEventListener('message', (e) => {
+  console.log('🔥 Got window message:', e.data, 'from', e.origin);
+});
+
+WebBrowser.maybeCompleteAuthSession();
+
 import React from "react";
 import { View, Text, Button, ScrollView } from "react-native";
 import { Link } from "expo-router";

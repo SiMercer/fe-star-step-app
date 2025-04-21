@@ -12,6 +12,7 @@ import { useRouter } from 'expo-router';
 export default function LoginScreen() {
   const { isLoading, isAuthenticated, login } = useAuth();
   const router = useRouter();
+  
 
 
   useEffect(() => {
@@ -31,7 +32,13 @@ export default function LoginScreen() {
   return (
     <View style={styles.container}>
       <Text style={styles.header}>Parent Login</Text>
-      <Button title="Log In" onPress={login} />
+      <Button
+  title={isAuthenticated ? "Already logged in" : "Log In"}
+  onPress={() => {
+    if (!isAuthenticated) login();
+  }}
+  disabled={isAuthenticated}
+/>
     </View>
   );
 }

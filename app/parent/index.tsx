@@ -5,7 +5,7 @@ import { useAuth } from "../../hooks/useAuth";
 
 export default function ParentDashboard() {
   const { isLoading, isAuthenticated, parent } = useAuth();
-
+  if (isLoading)
   return (
     <ScrollView contentContainerStyle={styles.container}>
 

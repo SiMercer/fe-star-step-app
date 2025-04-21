@@ -1,4 +1,3 @@
-// app/parent/add-child.tsx
 import React from "react";
 import {
   View,
@@ -13,7 +12,7 @@ import { useAuth } from "../../hooks/useAuth";
 
 export default function ParentAddChildScreen() {
   const router = useRouter();
-  const { isLoading, parent } = useAuth();
+  const { isLoading, isAuthenticated, parent, login } = useAuth();
 
   const handleAddDefaultChild = async () => {
     if (!parent) {
@@ -51,6 +50,11 @@ export default function ParentAddChildScreen() {
       </View>
     );
   }
+
+  if (!isAuthenticated) {
+    return <Button title="Log In First" onPress={login} />;
+  }
+
 
   return (
     <View style={styles.container}>

@@ -1,3 +1,6 @@
+import * as WebBrowser from 'expo-web-browser';
+WebBrowser.maybeCompleteAuthSession();
+
 import React from "react";
 import { View, Text, Button, ScrollView } from "react-native";
 import { Link } from "expo-router";

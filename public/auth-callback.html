@@ -2,14 +2,19 @@
 <html>
   <head>
     <meta charset="utf-8" />
-
-    <script src="https://unpkg.com/expo-auth-session@latest/build/web/expo-auth-session.js"></script>
+    <title>Auth Callback</title>
   </head>
   <body>
     <script>
-      window.onload = () => {
-        ExpoAuthSessionWeb.redirectAsync();
-      };
+      // grab everything after the “#” (the access token, etc)
+      const fullUrl = window.location.href;
+      // send it back to the opener
+      window.opener.postMessage(
+        { type: "expo-auth-session", url: fullUrl },
+        window.location.origin
+      );
+      // close the popup
+      window.close();
     </script>
   </body>
 </html>

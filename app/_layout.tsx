@@ -1,12 +1,10 @@
-
-import * as WebBrowser from 'expo-web-browser';
-WebBrowser.maybeCompleteAuthSession();
-
-import React from 'react';
 import { Slot } from 'expo-router';
-import Constants from 'expo-constants';
 import { Auth0Provider } from '@auth0/auth0-react';
 import { AuthProvider } from '../hooks/useAuth';
+
+console.log('Slot is:', Slot);
+console.log('Auth0Provider is:', Auth0Provider);
+console.log('AuthProvider is:', AuthProvider);
 
 const { auth0Domain, auth0ClientId, auth0Audience } =
   Constants.expoConfig.extra;

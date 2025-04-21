@@ -16,7 +16,7 @@ export default function LoginScreen() {
 
   useEffect(() => {
     if (!isLoading && isAuthenticated) {
-      router.replace('/parent/dashboard');
+      router.replace('/parent');
     }
   }, [isLoading, isAuthenticated, router]);
 

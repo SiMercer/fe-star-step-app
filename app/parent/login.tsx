@@ -1,3 +1,6 @@
+import * as WebBrowser from 'expo-web-browser';
+WebBrowser.maybeCompleteAuthSession();
+
 import React, { useEffect } from "react";
 import { Button, View, Alert } from "react-native";
 import Constants from "expo-constants";

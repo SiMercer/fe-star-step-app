@@ -175,7 +175,7 @@ export const getRewardById = (reward_id) => {
 
 export const deleteRewardById = (reward_id) => {
   return apiRequest
-    .delete(`tasks/${reward_id}`)
+    .delete(`rewards/${reward_id}`) // task initally // corrected to rewards
     .then(({ data }) => {
       return data;
     })

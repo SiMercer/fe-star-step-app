@@ -5,6 +5,8 @@ export default {
     name: "StarSteps",
     slug: "fe-star-step-app",
     version: "1.0.0",
+    sdkVersion: "52.0.0",
+    userInterfaceStyle: "automatic",
     platforms: ["ios", "android", "web"],
     extra: {
       auth0Domain: process.env.EXPO_PUBLIC_AUTH0_DOMAIN,

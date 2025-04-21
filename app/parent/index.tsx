@@ -15,7 +15,7 @@ export default function ParentDashboard() {
 
       <View style={{ marginBottom: 20, width: "100%" }}>
         <Link href="/parent/add-child" asChild>
-          <Button title="Add Child" />
+          <Button title="Add a Child" />
         </Link>
       </View>
 

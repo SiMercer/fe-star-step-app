@@ -1,51 +1,35 @@
 import React from 'react';
-import { ScrollView, View, Text, Button, StyleSheet } from 'react-native';
-import { Link } from 'expo-router';
+import { ScrollView, View, Text, Button } from 'react-native';
+import { useRouter } from 'expo-router';
 import { useAuth } from '../hooks/useAuth';
 
 export default function HomeScreen() {
-  const { isAuthenticated, login, logout, isLoading } = useAuth();
+  const router = useRouter();
+  const { parent } = useAuth();
 
   return (
-    <ScrollView contentContainerStyle={styles.container}>
-      <Text style={styles.title}>StarSteps</Text>
+    <ScrollView
+      contentContainerStyle={{
+        flex: 1,
+        justifyContent: 'center',
+        alignItems: 'center',
+        padding: 20,
+      }}
+    >
+      <Text style={{ fontSize: 28, marginBottom: 20 }}>StarSteps</Text>
 
-      {isLoading ? (
-        <Text>Loading…</Text>
-      ) : isAuthenticated ? (
-        <Button title="Log Out" onPress={logout} />
+      {parent ? (
+        <Text>You are logged in as: {parent.parentName}</Text>
       ) : (
-        <Button title="Log In" onPress={login} />
+        <Text>You are not logged in</Text>
       )}
 
-      <View style={styles.navItem}>
-        <Link href="/child" asChild>
-          <Button title="Child Dashboard" />
-        </Link>
-      </View>
-
-      <View style={styles.navItem}>
-        <Link href="/parent/login" asChild>
-          <Button title="Parent Login" />
-        </Link>
-      </View>
-
-      <View style={styles.navItem}>
-        <Link href="/parent/register" asChild>
-          <Button title="Register" />
-        </Link>
+      <View style={{ marginTop: 20, width: '100%' }}>
+        <Button
+          title="Parent Login"
+          onPress={() => router.push('/parent/login')}
+        />
       </View>
     </ScrollView>
   );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flexGrow: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    padding: 20,
-  },
-  title: { fontSize: 28, marginBottom: 20 },
-  navItem: { width: '100%', marginVertical: 8 },
-});

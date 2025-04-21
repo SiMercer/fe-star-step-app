@@ -6,14 +6,12 @@
   </head>
   <body>
     <script>
-      // grab everything after the “#” (the access token, etc)
-      const fullUrl = window.location.href;
-      // send it back to the opener
+      // send the full URL (including #access_token=…) back to the opener window
       window.opener.postMessage(
-        { type: "expo-auth-session", url: fullUrl },
+        { type: "expo-auth-session", url: window.location.href },
         window.location.origin
       );
-      // close the popup
+      // then close the popup
       window.close();
     </script>
   </body>

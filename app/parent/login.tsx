@@ -1,10 +1,9 @@
 import React, { useEffect } from 'react';
-import { ActivityIndicator, View, StyleSheet } from 'react-native';
+import { View, ActivityIndicator, StyleSheet } from 'react-native';
 import { useAuth } from '../../hooks/useAuth';
 
 export default function ParentLogin() {
   const { login, isLoading, parent } = useAuth();
-
 
   useEffect(() => {
     if (!isLoading && !parent) {
@@ -20,5 +19,5 @@ export default function ParentLogin() {
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, alignItems: 'center', justifyContent: 'center' },
+  container: { flex:1, justifyContent:'center', alignItems:'center' },
 });

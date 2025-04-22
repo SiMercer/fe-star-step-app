@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { ScrollView, Text, View, StyleSheet, Button } from "react-native";
 import RewardCardList from "./reward-cardlist";
-import AddRewardForm from "./add-rewards";
+// import AddRewardForm from "./add-rewards";
 import { router } from "expo-router";
 import { getRewardsByParent } from "@/utils/api";
 
@@ -56,6 +56,7 @@ export default function ParentRewardsScreen() {
       />
 
       <Text style={[styles.heading, { marginTop: 24 }]}>Create a Reward</Text>
+
       <AddRewardForm onRewardAdded={handleAddReward} />
 
       <Button

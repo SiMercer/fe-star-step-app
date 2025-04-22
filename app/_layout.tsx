@@ -1,15 +1,18 @@
-import { Stack } from "expo-router";
+import * as WebBrowser from "expo-web-browser";
+WebBrowser.maybeCompleteAuthSession();
+
+import React from "react";
 import { Slot } from "expo-router";
-import { UserProvider } from "./context/UserContext";
+import { AuthProvider } from "../hooks/useAuth";
+import { ChildProvider } from "../contexts/ChildContext";
 
-// export default function Layout() {
-//   return <Stack screenOptions={{ headerShown: false }} />;
-// }
 
-export default function Layout() {
+export default function RootLayout() {
   return (
-    <UserProvider>
+    <AuthProvider>
+      <ChildProvider>
       <Slot />
-    </UserProvider>
+      </ChildProvider>
+    </AuthProvider>
   );
 }

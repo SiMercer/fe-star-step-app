@@ -1,23 +1,33 @@
 import React from "react";
 import { View, Text, Button } from "react-native";
 import { useRouter, Link } from "expo-router";
-
+import { useChild } from "../../contexts/ChildContext";
 
 export default function ChildDashboardScreen() {
   const router = useRouter();
+  const { selectedChild } = useChild();
 
-return (
+  return (
     <View style={{ flex: 1, justifyContent: "space-between", padding: 20 }}>
-        
-      <Text style={{ fontSize: 24, marginTop: 20 }}>Child Dashboard</Text>
+      <View>
+        <Text style={{ fontSize: 24, marginTop: 20 }}>Child Dashboard</Text>
+
+        {selectedChild ? (
+          <Text style={{ fontSize: 18, marginTop: 10 }}>
+            Hello, {selectedChild.name}!
+          </Text>
+        ) : (
+          <Text style={{ fontSize: 18, marginTop: 10, color: "red" }}>
+            No child selected.
+          </Text>
+        )}
+      </View>
 
       <View style={{ flexDirection: "row", justifyContent: "space-around", marginBottom: 20 }}>
         <Link href="/" asChild>
           <Button title="Back" onPress={() => {}} />
         </Link>
       </View>
-      
-
 
       <View style={{ flexDirection: "row", justifyContent: "space-around", marginBottom: 20 }}>
         <Link href="/child" asChild>

@@ -4,9 +4,14 @@ import React, {
   useEffect,
   useState,
   ReactNode,
-} from 'react';
-import Constants from 'expo-constants';
-import { useAuth0 } from '@auth0/auth0-react';
+} from "react";
+import Constants from "expo-constants";
+import {
+  useAuthRequest,
+  makeRedirectUri,
+  ResponseType,
+  revokeAsync,
+} from "expo-auth-session";
 
 interface Parent {
   _id: string;
@@ -14,10 +19,9 @@ interface Parent {
 }
 
 interface AuthContextType {
-  isAuthenticated: boolean;
-  login: () => void;
-  logout: () => void;
   isLoading: boolean;
+  login: () => Promise<void>;
+  logout: () => Promise<void>;
   parent: Parent | null;
 }
 
@@ -25,65 +29,99 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const {
-    isAuthenticated,
-    loginWithRedirect,
-    logout: auth0Logout,
-    getAccessTokenSilently,
-    user,
-    isLoading: auth0Loading,
-  } = useAuth0();
+    auth0Domain,
+    auth0ClientId,
+    auth0Audience,
+    redirectUri,
+  } = Constants.expoConfig!.extra as Record<string, string>;
 
+  const discovery = {
+    authorizationEndpoint: `https://${auth0Domain}/authorize`,
+    tokenEndpoint: `https://${auth0Domain}/oauth/token`,
+    revocationEndpoint: `https://${auth0Domain}/oauth/revoke`,
+  };
+
+  const [request, response, promptAsync] = useAuthRequest(
+    {
+      clientId: auth0ClientId,
+      responseType: ResponseType.Token,
+      scopes: ["openid", "profile", "email"],
+      redirectUri: makeRedirectUri({ useProxy: true }),
+      extraParams: { audience: auth0Audience },
+    },
+    discovery
+  );
+
+  const [isLoading, setIsLoading] = useState(true);
   const [parent, setParent] = useState<Parent | null>(null);
-  const [loading, setLoading] = useState(true);
-
-  const { auth0Audience } = Constants.expoConfig!.extra as Record<string, string>;
+  const [accessToken, setAccessToken] = useState<string | null>(null);
 
   useEffect(() => {
-    const registerParent = async () => {
-      if (isAuthenticated && user) {
+    if (response?.type === "success") {
+      const token = response.params.access_token!;
+      setAccessToken(token);
+      (async () => {
         try {
-          const token = await getAccessTokenSilently({ audience: auth0Audience });
-          const res = await fetch(
-            'https://be-star-step-app-dev.onrender.com/api/parents',
+          // fetch Auth0 profile
+          const uiRes = await fetch(`https://${auth0Domain}/userinfo`, {
+            headers: { Authorization: `Bearer ${token}` },
+          });
+          const ui = await uiRes.json();
+
+          // register/fetch
+          const apiRes = await fetch(
+            "https://be-star-step-app-dev.onrender.com/api/parents",
             {
-              method: 'POST',
+              method: "POST",
               headers: {
-                'Content-Type': 'application/json',
-                Authorization: `Bearer ${token}`,
+                "Content-Type": "application/json",
               },
               body: JSON.stringify({
-                auth0Id: user.sub,
-                parentName: user.name || 'Unnamed Parent',
+                auth0Id: ui.sub,
+                parentName: ui.name || "Unnamed Parent",
               }),
             }
           );
-          if (!res.ok) throw new Error((await res.json()).msg || 'Registration failed');
-          const data: Parent = await res.json();
+          const data = await apiRes.json();
+          if (!apiRes.ok) throw new Error(data.msg);
+
           setParent(data);
-        } catch (e) {
-          console.error('Parent registration error:', e);
+        } catch (err) {
+          console.error("Login/register error:", err);
+          setParent(null);
+        } finally {
+          setIsLoading(false);
         }
-      }
-      setLoading(false);
-    };
+      })();
+    } else {
+      setIsLoading(false);
+    }
+  }, [response]);
 
-    registerParent();
-  }, [isAuthenticated, user, getAccessTokenSilently, auth0Audience]);
-
-  const value: AuthContextType = {
-    isAuthenticated,
-    login: () => loginWithRedirect(),
-    logout: () =>
-      auth0Logout({ returnTo: window.location.origin }),
-    isLoading: auth0Loading || loading,
-    parent,
+  const login = async () => {
+    setIsLoading(true);
+    await promptAsync();
   };
 
-  return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
+  const logout = async () => {
+    if (accessToken) {
+      await revokeAsync(
+        { token: accessToken },
+        { revocationEndpoint: discovery.revocationEndpoint }
+      );
+    }
+    setParent(null);
+  };
+
+  return (
+    <AuthContext.Provider value={{ isLoading, login, logout, parent }}>
+      {children}
+    </AuthContext.Provider>
+  );
 };
 
-export const useAuth = () => {
+export function useAuth() {
   const ctx = useContext(AuthContext);
-  if (!ctx) throw new Error('useAuth must be used within AuthProvider');
+  if (!ctx) throw new Error("useAuth must be used within AuthProvider");
   return ctx;
-};
+}

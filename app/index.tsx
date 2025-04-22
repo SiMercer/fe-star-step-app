@@ -1,10 +1,10 @@
-import React from 'react';
-import { ScrollView, View, Text, Button, StyleSheet } from 'react-native';
-import { Link } from 'expo-router';
-import { useAuth } from '../hooks/useAuth';
+import React from "react";
+import { ScrollView, View, Text, Button, StyleSheet } from "react-native";
+import { Link } from "expo-router";
+import { useAuth } from "../hooks/useAuth";
 
 export default function HomeScreen() {
-  const { isAuthenticated, login, logout, isLoading } = useAuth();
+  const { parent, isLoading, login, logout } = useAuth();
 
   return (
     <ScrollView contentContainerStyle={styles.container}>
@@ -12,17 +12,11 @@ export default function HomeScreen() {
 
       {isLoading ? (
         <Text>Loading…</Text>
-      ) : isAuthenticated ? (
+      ) : parent ? (
         <Button title="Log Out" onPress={logout} />
       ) : (
         <Button title="Log In" onPress={login} />
       )}
-
-      <View style={styles.navItem}>
-        <Link href="/child" asChild>
-          <Button title="Child Dashboard" />
-        </Link>
-      </View>
 
       <View style={styles.navItem}>
         <Link href="/parent/login" asChild>
@@ -31,8 +25,8 @@ export default function HomeScreen() {
       </View>
 
       <View style={styles.navItem}>
-        <Link href="/parent/register" asChild>
-          <Button title="Register" />
+        <Link href="/parent" asChild>
+          <Button title="Parent Dashboard" />
         </Link>
       </View>
     </ScrollView>
@@ -40,12 +34,7 @@ export default function HomeScreen() {
 }
 
 const styles = StyleSheet.create({
-  container: {
-    flexGrow: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    padding: 20,
-  },
-  title: { fontSize: 28, marginBottom: 20 },
-  navItem: { width: '100%', marginVertical: 8 },
+  container: { flexGrow: 1, justifyContent: "center", alignItems: "center", padding: 20 },
+  title:     { fontSize: 28, marginBottom: 20 },
+  navItem:   { width: "100%", marginVertical: 8 },
 });

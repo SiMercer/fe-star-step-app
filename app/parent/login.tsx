@@ -1,42 +1,29 @@
-import React, { useEffect } from 'react';
-import {
-  View,
-  Text,
-  Button,
-  StyleSheet,
-  ActivityIndicator,
-} from 'react-native';
-import { useAuth } from '../../hooks/useAuth';
-import { useRouter } from 'expo-router';
+import React from "react";
+import { View, Text, Button, ScrollView } from "react-native";
+import { Link } from "expo-router";
+import { useAuth } from "../../hooks/useAuth";
 
-export default function LoginScreen() {
-  const { isLoading, isAuthenticated, login } = useAuth();
-  const router = useRouter();
-
-
-  useEffect(() => {
-    if (!isLoading && isAuthenticated) {
-      router.replace('/parent');
-    }
-  }, [isLoading, isAuthenticated, router]);
-
-  if (isLoading) {
-    return (
-      <View style={styles.container}>
-        <ActivityIndicator size="large" />
-      </View>
-    );
-  }
+export default function ParentLoginScreen() {
+  const { parent, login, isLoading } = useAuth();
 
   return (
-    <View style={styles.container}>
-      <Text style={styles.header}>Parent Login</Text>
-      <Button title="Log In" onPress={login} />
-    </View>
+    <ScrollView
+      contentContainerStyle={{
+        flexGrow: 1,
+        justifyContent: "center",
+        alignItems: "center",
+        padding: 20,
+      }}
+    >
+      <Text style={{ fontSize: 24, marginBottom: 20 }}>Parent Login</Text>
+
+      <Button title={isLoading ? "Loading…" : "Log In"} onPress={login} disabled={isLoading} />
+
+      <View style={{ marginTop: 30 }}>
+        <Link href="/parent" asChild>
+          <Button title="Go to Dashboard" />
+        </Link>
+      </View>
+    </ScrollView>
   );
 }
-
-const styles = StyleSheet.create({
-  container: { flex: 1, justifyContent: 'center', alignItems: 'center', padding: 16 },
-  header: { fontSize: 24, marginBottom: 16 },
-});

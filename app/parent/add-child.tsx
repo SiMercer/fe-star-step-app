@@ -20,7 +20,7 @@ export default function ParentAddChildScreen() {
           name: "Default Child",
           age: 6,
           avatar: "https://example.com/default-avatar.png",
-          parentID: parent._id,           // must be a string
+          parentID: parent._id,
         }),
       });
 

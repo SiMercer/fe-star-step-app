@@ -67,14 +67,24 @@ export const getKidById = (child_id) => {
     });
 };
 
+export const getKidByParentId = (parentID) => {
+  return apiRequest
+    .get(`kids/parent/${parentID}`)
+    .then(({ data }) => {
+      return data;
+    })
+    .catch((err) => {
+      console.error("❌ Axios error message:", err.message);
+    });
+};
+
 ////TASKS
 
-export const postNewTask = (parent, child, task) => {
-  task.createdBy = [parent];
-  task.assignedTo = [child];
-  console.log(task);
+export const postNewTask = (parent_id, child_id, task) => {
+  task.createdBy = parent_id;
+  task.assignedTo = child_id;
   return apiRequest
-    .post(`tasks/`, task)
+    .post(`tasks/parent/${parent_id}`, task)
     .then(({ data }) => {
       return data;
     })
@@ -93,8 +103,9 @@ export const editTask = (task_id, taskUpdates) => {
     });
 };
 export const getTasksByParent = (parent_id) => {
+  console.log(parent_id);
   return apiRequest
-    .get(`tasks?createdBy=${parent_id}`)
+    .get(`tasks/parent/${parent_id}`)
     .then(({ data }) => {
       return data;
     })
@@ -105,7 +116,7 @@ export const getTasksByParent = (parent_id) => {
 
 export const getTasksByKid = (kid_id) => {
   return apiRequest
-    .get(`tasks?assignedTo=${kid_id}`)
+    .get(`tasks/kids/${kid_id}`)
     .then(({ data }) => {
       return data;
     })
@@ -173,7 +184,7 @@ export const getRewardById = (reward_id) => {
 
 export const deleteRewardById = (reward_id) => {
   return apiRequest
-    .delete(`tasks/${reward_id}`)
+    .delete(`rewards/${reward_id}`) // task initally // corrected to rewards
     .then(({ data }) => {
       return data;
     })

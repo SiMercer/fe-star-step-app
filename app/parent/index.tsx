@@ -15,9 +15,11 @@ export default function ParentDashboard() {
         padding: 20,
       }}
     >
-      <Text style={{ fontSize: 26, marginBottom: 20, fontWeight: "bold" }}>
+
+      <Text style={{ fontSize: 26, marginBottom: 30, fontWeight: "bold" }}>
         Parent Dashboard
       </Text>
+
 
       {isLoading ? (
         <ActivityIndicator size="large" />
@@ -31,6 +33,7 @@ export default function ParentDashboard() {
         </Text>
       )}
 
+
       <View style={{ marginBottom: 20, width: "100%" }}>
         <Link href="/" asChild>
           <Button title="Back Home" />
@@ -39,9 +42,27 @@ export default function ParentDashboard() {
 
       <View style={{ marginBottom: 20, width: "100%" }}>
         <Link href="/parent/add-child" asChild>
+
+          <Button title="Add Child" />
+        </Link>
+      </View>
+
+      <View style={{ marginBottom: 20, width: "100%" }}>
+        <Link href="/parent/tasks" asChild>
+          <Button title="Add Task" />
+        </Link>
+      </View>
+
+      <View style={{ marginBottom: 20, width: "100%" }}>
+        <Link href="/parent/rewards" asChild>
+          <Button title="Rewards" />
+        </Link>
+      </View>
+
           <Button title="Add a Child" />
         </Link>
       </View>
+
     </ScrollView>
   );
 }

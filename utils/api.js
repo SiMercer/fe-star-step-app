@@ -1,7 +1,7 @@
 import axios from "axios";
 
 const apiRequest = axios.create({
-  baseURL: "https://be-star-step-app-dev.onrender.com/",
+  baseURL: "https://be-star-step-app-dev.onrender.com/api/",
   headers: {
     "Content-Type": "application/json",
   },
@@ -47,7 +47,7 @@ export const createKidProfile = (parent_id, kidData) => {
 ///
 export const editKidProfile = (child_id, kidData) => {
   return apiRequest
-    .patch(`kids/${child_id}`, kidData)
+    .patch(`kids/${child_id}/stars`, kidData)
     .then(({ data }) => {
       return data;
     })
@@ -151,8 +151,6 @@ export const postNewReward = (parent, reward) => {
 };
 
 export const editReward = (reward_id, rewardUpdates) => {
-  console.log(reward_id);
-  console.log(rewardUpdates);
   return apiRequest
     .patch(`rewards/${reward_id}`, rewardUpdates)
     .then(({ data }) => {

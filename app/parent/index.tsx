@@ -59,9 +59,7 @@ export default function ParentDashboard() {
         </Link>
       </View>
 
-          <Button title="Add a Child" />
-        </Link>
-      </View>
+
 
     </ScrollView>
   );

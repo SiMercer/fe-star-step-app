@@ -2,7 +2,7 @@ import { View, Text, Button, ActivityIndicator } from "react-native";
 import { Link } from "expo-router";
 import { useEffect, useState } from "react";
 import ChildsRewardsItem from "./rewardsItem";
-import { getRewardsByParent } from "../../utils/api";
+import { getKidById, getRewardsByParent } from "../../utils/api";
 
 interface Rewards {
   reward_id: string;
@@ -14,13 +14,18 @@ interface Rewards {
 }
 
 export default function ChildRewardsScreen() {
-  const [rewards, setRewards] = useState<Rewards[]>([]);
+  const [listRewards, setListRewards] = useState<Rewards[]>([]);
+  const [totalStars, setTotalStars] = useState<number>(0);
   const [isLoading, setIsLoading] = useState<boolean>(true);
   useEffect(() => {
     setIsLoading(true);
-    getRewardsByParent("000000000000000000000001").then(
+    getKidById("000000000000000000000002").then(({ stars }) => {
+      setTotalStars(stars);
+      console.log(totalStars);
+    });
+    getRewardsByParent("auth0|test123").then(
       ({ rewards }: { rewards: Rewards[] }) => {
-        setRewards(rewards);
+        setListRewards(rewards);
         setIsLoading(false);
       }
     );
@@ -28,12 +33,24 @@ export default function ChildRewardsScreen() {
   return (
     <View style={{ flex: 1, justifyContent: "space-between", padding: 20 }}>
       <Text style={{ fontSize: 24, marginTop: 20 }}>Rewards</Text>
+      <Text>Total Stars: {totalStars}⭐</Text>
       {!isLoading ? (
-        <View style={{ height: "80%", justifyContent: "flex-start" }}>
-          {rewards.map((reward: Rewards) => {
-            return <ChildsRewardsItem key={reward.reward_id} reward={reward} />;
-          })}
-        </View>
+        listRewards.length === 0 ? (
+          <Text>There are no rewards</Text>
+        ) : (
+          <View style={{ height: "80%", justifyContent: "flex-start" }}>
+            {listRewards.map((reward: Rewards) => {
+              return (
+                <ChildsRewardsItem
+                  key={reward.reward_id}
+                  reward={reward}
+                  totalStars={totalStars}
+                  setTotalStars={setTotalStars}
+                />
+              );
+            })}
+          </View>
+        )
       ) : (
         <ActivityIndicator />
       )}

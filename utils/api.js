@@ -1,7 +1,9 @@
 import axios from "axios";
 
 const apiRequest = axios.create({
+
   baseURL: "https://be-star-step-app-dev.onrender.com/api/",
+
   headers: {
     "Content-Type": "application/json",
   },

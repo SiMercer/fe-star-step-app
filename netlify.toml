@@ -1,5 +1,5 @@
 [build]
-  command = "expo export --platform web --output-dir web-build"
+  command = "npx expo export --platform web --output-dir web-build"
   publish = "web-build"
 
 [[redirects]]

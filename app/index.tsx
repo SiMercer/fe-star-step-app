@@ -1,29 +1,40 @@
 import React from "react";
-import { View, Text, Button, ScrollView } from "react-native";
+import { ScrollView, View, Text, Button, StyleSheet } from "react-native";
 import { Link } from "expo-router";
+import { useAuth } from "../hooks/useAuth";
 
 export default function HomeScreen() {
+  const { parent, isLoading, login, logout } = useAuth();
+
   return (
-    <ScrollView contentContainerStyle={{ flexGrow: 1, justifyContent: "center", alignItems: "center", padding: 20 }}>
-      <Text style={{ fontSize: 28, marginBottom: 20 }}>StarSteps</Text>
+    <ScrollView contentContainerStyle={styles.container}>
+      <Text style={styles.title}>StarSteps</Text>
 
-      <View style={{ marginBottom: 20, width: "100%" }}>
-        <Link href="/child" asChild>
-          <Button title="Child 1 Dashboard" />
-        </Link>
-      </View>
+      {isLoading ? (
+        <Text>Loading…</Text>
+      ) : parent ? (
+        <Button title="Log Out" onPress={logout} />
+      ) : (
+        <Button title="Log In" onPress={login} />
+      )}
 
-      <View style={{ marginBottom: 20, width: "100%" }}>
+      <View style={styles.navItem}>
         <Link href="/parent/login" asChild>
           <Button title="Parent Login" />
         </Link>
       </View>
 
-      <View style={{ width: "100%" }}>
-        <Link href="/parent/register" asChild>
-          <Button title="Register" />
+      <View style={styles.navItem}>
+        <Link href="/parent" asChild>
+          <Button title="Parent Dashboard" />
         </Link>
       </View>
     </ScrollView>
   );
 }
+
+const styles = StyleSheet.create({
+  container: { flexGrow: 1, justifyContent: "center", alignItems: "center", padding: 20 },
+  title:     { fontSize: 28, marginBottom: 20 },
+  navItem:   { width: "100%", marginVertical: 8 },
+});

@@ -1,43 +1,34 @@
 import React from "react";
-import { View, Text, StyleSheet, Button } from "react-native";
-import { useRouter } from "expo-router";
+import { Button, View } from "react-native";
+import * as AuthSession from "expo-auth-session";
+import Constants from "expo-constants";
 
-export default function ParentTasksScreen() {
-  const router = useRouter();
+const {
+  auth0Domain,
+  auth0ClientId,
+  auth0Audience,
+  redirectUri,
+} = Constants.expoConfig.extra;
+
+const discovery = {
+  authorizationEndpoint: `https://${auth0Domain}/authorize`,
+  tokenEndpoint: `https://${auth0Domain}/oauth/token`,
+  revocationEndpoint: `https://${auth0Domain}/oauth/revoke`,
+};
+
+export default function RegisterScreen() {
+  const handleRegister = async () => {
+    const authUrl = `https://${auth0Domain}/authorize?client_id=${auth0ClientId}` +
+      `&response_type=token&redirect_uri=${encodeURIComponent(redirectUri)}` +
+      `&scope=openid%20profile%20email&audience=${auth0Audience}`;
+
+    const result = await AuthSession.startAsync({ authUrl });
+    console.log("Register result:", result);
+  };
 
   return (
-    <View style={styles.container}>
-      <Text style={styles.heading}>Register Title</Text>
-      <Text style={styles.subtext}>
-      ( form to register )    
-      </Text>
-
-      <View style={styles.buttonGroup}>
-        <Button title="Back" onPress={() => router.push("/")} />
-      </View>
+    <View>
+      <Button title="Register" onPress={handleRegister} />
     </View>
   );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    padding: 24,
-    justifyContent: "center",
-    alignItems: "center",
-    backgroundColor: "#fff",
-  },
-  heading: {
-    fontSize: 24,
-    fontWeight: "bold",
-  },
-  subtext: {
-    fontSize: 16,
-    marginTop: 12,
-    textAlign: "center",
-  },
-  buttonGroup: {
-    marginTop: 32,
-    gap: 16,
-  },
-});

@@ -4,7 +4,6 @@ import { Link, useRouter } from "expo-router";
 import { useAuth } from "../hooks/useAuth";
 import { useChild } from "../contexts/ChildContext";
 
-
 export default function HomeScreen() {
   const { parent, isLoading, login, logout } = useAuth();
   const { setSelectedChild } = useChild();
@@ -13,7 +12,9 @@ export default function HomeScreen() {
 
   useEffect(() => {
     if (parent?._id) {
-      fetch(`https://be-star-step-app-dev.onrender.com/api/kids/parent/${parent._id}`)
+      fetch(
+        `https://be-star-step-app-dev.onrender.com/api/kids/parent/${parent._id}`
+      )
         .then((res) => res.json())
         .then((data) => {
           console.log("Fetched children:", data);
@@ -44,7 +45,10 @@ export default function HomeScreen() {
               <Text style={styles.subtitle}>Select a Child:</Text>
               {children.map((child) => (
                 <View key={child._id} style={styles.navItem}>
-<Button title={child.name} onPress={() => handleSelectChild(child)} />
+                  <Button
+                    title={child.name}
+                    onPress={() => handleSelectChild(child)}
+                  />
                 </View>
               ))}
             </>
@@ -70,8 +74,13 @@ export default function HomeScreen() {
 }
 
 const styles = StyleSheet.create({
-  container: { flexGrow: 1, justifyContent: "center", alignItems: "center", padding: 20 },
-  title:     { fontSize: 28, marginBottom: 20 },
-  subtitle:  { fontSize: 20, marginTop: 20, marginBottom: 10 },
-  navItem:   { width: "100%", marginVertical: 8 },
+  container: {
+    flexGrow: 1,
+    justifyContent: "center",
+    alignItems: "center",
+    padding: 20,
+  },
+  title: { fontSize: 28, marginBottom: 20 },
+  subtitle: { fontSize: 20, marginTop: 20, marginBottom: 10 },
+  navItem: { width: "100%", marginVertical: 8 },
 });

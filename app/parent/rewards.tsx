@@ -4,6 +4,7 @@ import RewardCardList from "./reward-cardlist";
 // import AddRewardForm from "./add-rewards";
 import { router } from "expo-router";
 import { getRewardsByParent } from "@/utils/api";
+import AddRewardForm from "./add-rewards";
 
 interface Rewards {
   reward_id: string;
@@ -21,8 +22,9 @@ export default function ParentRewardsScreen() {
 
   useEffect(() => {
     setIsLoading(true);
-    getRewardsByParent("000000000000000000000001")
+    getRewardsByParent("local-test-id")
       .then(({ rewards }) => {
+        console.log(rewards);
         setRewards(rewards);
       })
       .catch(console.error)

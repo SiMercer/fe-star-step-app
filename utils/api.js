@@ -149,7 +149,7 @@ export const deleteTask = (task_id) => {
 
 ////REWARDS
 export const postNewReward = (parent, reward) => {
-  reward.createdBy = [parent];
+  reward.createdBy = parent;
 
   return apiRequest
     .post(`rewards/`, reward)

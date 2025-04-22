@@ -4,7 +4,7 @@ import ModalSelector from "react-native-modal-selector";
 import { postNewReward } from "@/utils/api";
 
 type AddRewardFormProps = {
-  parentId: "000000000000000000000001";
+  parentId: "local-test-id";
   onRewardAdded?: () => void;
 };
 
@@ -42,7 +42,7 @@ export default function AddRewardForm({
     const reward = {
       title: title.trim(),
       cost,
-      createdBy: [parentId],
+      createdBy: parentId,
     };
     // Set parent_id by waiting for auth0
 

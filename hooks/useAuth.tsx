@@ -1,4 +1,6 @@
-// hooks/useAuth.tsx
+import * as WebBrowser from 'expo-web-browser';
+WebBrowser.maybeCompleteAuthSession();
+
 import React, {
   createContext,
   useContext,
@@ -11,7 +13,6 @@ import {
   useAuthRequest,
   makeRedirectUri,
   ResponseType,
-  revokeAsync,
 } from 'expo-auth-session';
 
 interface Parent {
@@ -20,21 +21,25 @@ interface Parent {
 }
 
 interface AuthContextType {
-  isLoading: boolean;
-  promptLogin: () => Promise<void>;
-  logout: () => Promise<void>;
   parent: Parent | null;
+  isLoading: boolean;
+  login: () => Promise<void>;
 }
 
-const AuthContext = createContext<AuthContextType | undefined>(undefined);
+const AuthContext = createContext<AuthContextType>({
+  parent: null,
+  isLoading: false,
+  login: async () => {},
+});
 
 export const AuthProvider = ({ children }: { children: ReactNode }) => {
-  // pull your Auth0 config out of app.config.js → extra
+  const [parent, setParent] = useState<Parent | null>(null);
+  const [isLoading, setIsLoading] = useState(false);
+
   const {
     auth0Domain,
     auth0ClientId,
     auth0Audience,
-    redirectUri,             // you should set this in app.config.js extra
   } = Constants.expoConfig!.extra as Record<string, string>;
 
   const discovery = {
@@ -43,7 +48,6 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     revocationEndpoint: `https://${auth0Domain}/oauth/revoke`,
   };
 
-  // set up the AuthRequest hook
   const [request, response, promptAsync] = useAuthRequest(
     {
       clientId: auth0ClientId,
@@ -55,80 +59,54 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     discovery
   );
 
-  const [isLoading, setIsLoading] = useState(true);
-  const [parent, setParent] = useState<Parent | null>(null);
-  const [accessToken, setAccessToken] = useState<string | null>(null);
-
-  // when AuthSession returns, exchange token → fetch userinfo → post to backend
   useEffect(() => {
     if (response?.type === 'success') {
-      const token = response.params.access_token!;
-      setAccessToken(token);
+      const { access_token } = response.params;
       (async () => {
         try {
-          // 1. fetch Auth0 userinfo
-          const uiRes = await fetch(`https://${auth0Domain}/userinfo`, {
-            headers: { Authorization: `Bearer ${token}` },
+          setIsLoading(true);
+          // fetch user info from Auth0
+          const userInfoRes = await fetch(`https://${auth0Domain}/userinfo`, {
+            headers: { Authorization: `Bearer ${access_token}` },
           });
-          const ui = await uiRes.json();
+          const userInfo = await userInfoRes.json();
 
-          // 2. register/fetch parent in your API
-          const apiRes = await fetch(
+          // register or fetch parent in your backend
+          const res = await fetch(
             'https://be-star-step-app-dev.onrender.com/api/parents',
             {
               method: 'POST',
               headers: { 'Content-Type': 'application/json' },
               body: JSON.stringify({
-                auth0Id: ui.sub,
-                parentName: ui.name || 'Unnamed Parent',
+                auth0Id: userInfo.sub,
+                parentName: userInfo.name || 'Unnamed Parent',
               }),
             }
           );
-          const data = await apiRes.json();
-          if (!apiRes.ok) throw new Error(data.msg || 'Registration failed');
-
+          const data = await res.json();
+          if (!res.ok) throw new Error(data.msg || 'Registration failed');
           setParent(data);
         } catch (err) {
-          console.error('Login/register error:', err);
-          setParent(null);
+          console.error('Auth/register error:', err);
         } finally {
           setIsLoading(false);
         }
       })();
-    } else {
-      // no response yet or user cancelled
-      setIsLoading(false);
     }
   }, [response]);
 
-  // expose a simple login() wrapper
-  const promptLogin = async () => {
+  const login = async () => {
     setIsLoading(true);
     await promptAsync();
   };
 
-  // optional: revoke your token on logout
-  const logout = async () => {
-    if (accessToken) {
-      await revokeAsync(
-        { token: accessToken },
-        { revocationEndpoint: discovery.revocationEndpoint }
-      );
-    }
-    setParent(null);
-  };
-
   return (
-    <AuthContext.Provider
-      value={{ isLoading, promptLogin, logout, parent }}
-    >
+    <AuthContext.Provider value={{ parent, isLoading, login }}>
       {children}
     </AuthContext.Provider>
   );
 };
 
-export function useAuth() {
-  const ctx = useContext(AuthContext);
-  if (!ctx) throw new Error('useAuth must be used within AuthProvider');
-  return ctx;
-}
+export const useAuth = () => {
+  return useContext(AuthContext);
+};

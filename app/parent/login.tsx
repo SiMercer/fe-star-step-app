@@ -1,42 +1,21 @@
-import React, { useEffect } from 'react';
-import {
-  View,
-  Text,
-  Button,
-  StyleSheet,
-  ActivityIndicator,
-} from 'react-native';
+import React from 'react';
+import { View, Button, ActivityIndicator, StyleSheet } from 'react-native';
 import { useAuth } from '../../hooks/useAuth';
-import { useRouter } from 'expo-router';
 
-export default function LoginScreen() {
-  const { isLoading, isAuthenticated, login } = useAuth();
-  const router = useRouter();
-
-
-  useEffect(() => {
-    if (!isLoading && isAuthenticated) {
-      router.replace('/parent');
-    }
-  }, [isLoading, isAuthenticated, router]);
-
-  if (isLoading) {
-    return (
-      <View style={styles.container}>
-        <ActivityIndicator size="large" />
-      </View>
-    );
-  }
+export default function ParentLogin() {
+  const { login, isLoading } = useAuth();
 
   return (
     <View style={styles.container}>
-      <Text style={styles.header}>Parent Login</Text>
-      <Button title="Log In" onPress={login} />
+      {isLoading ? (
+        <ActivityIndicator size="large" />
+      ) : (
+        <Button title="Log In" onPress={login} />
+      )}
     </View>
   );
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, justifyContent: 'center', alignItems: 'center', padding: 16 },
-  header: { fontSize: 24, marginBottom: 16 },
+  container: { flex: 1, justifyContent: 'center', alignItems: 'center' },
 });

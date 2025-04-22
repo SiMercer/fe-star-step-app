@@ -2,8 +2,6 @@ import React, { useState, useEffect } from "react";
 import { View, TextInput, Button, StyleSheet, Alert } from "react-native";
 import ModalSelector from "react-native-modal-selector";
 import { postNewReward } from "@/utils/api";
-import { Platform } from "react-native";
-console.log("Running on:", Platform.OS);
 
 type AddRewardFormProps = {
   parentId: "000000000000000000000001";
@@ -48,7 +46,7 @@ export default function AddRewardForm({
     };
     // Set parent_id by waiting for auth0
 
-    postNewReward("000000000000000000000001", reward)
+    postNewReward("local-test-id", reward)
       .then((data) => {
         setTitle("");
         setCost(1);

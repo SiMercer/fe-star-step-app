@@ -28,11 +28,7 @@ interface AuthContextType {
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export const AuthProvider = ({ children }: { children: ReactNode }) => {
-  const {
-    auth0Domain,
-    auth0ClientId,
-    auth0Audience,
-  } = Constants.expoConfig!.extra as Record<string, string>;
+  const { auth0Domain, auth0ClientId, auth0Audience, USE_FAKE_AUTH } = Constants.expoConfig!.extra as Record<string, string>;
 
   const discovery = {
     authorizationEndpoint: `https://${auth0Domain}/authorize`,
@@ -55,20 +51,26 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [parent, setParent] = useState<Parent | null>(null);
   const [accessToken, setAccessToken] = useState<string | null>(null);
 
-
   useEffect(() => {
+    if (USE_FAKE_AUTH === "true") {
+      setParent({
+        _id: "local-test-id",
+        parentName: "Local Test Parent",
+      });
+      setIsLoading(false);
+      return;
+    }
+
     if (response?.type === "success") {
       const token = response.params.access_token!;
       setAccessToken(token);
 
       (async () => {
         try {
-
           const uiRes = await fetch(`https://${auth0Domain}/userinfo`, {
             headers: { Authorization: `Bearer ${token}` },
           });
           const ui = await uiRes.json();
-
 
           const apiRes = await fetch(
             "https://be-star-step-app-dev.onrender.com/api/parents",
@@ -81,6 +83,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
               }),
             }
           );
+
           const data = await apiRes.json();
           if (!apiRes.ok) throw new Error(data.msg);
 
@@ -93,31 +96,38 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         }
       })();
     } else {
-
       setIsLoading(false);
     }
-  }, [response]);
+  }, [response, USE_FAKE_AUTH]);
 
   const login = async () => {
-    setIsLoading(true);
-    await promptAsync();
+    if (USE_FAKE_AUTH === "true") {
+      setParent({
+        _id: "local-test-id",
+        parentName: "Local Test Parent",
+      });
+      setIsLoading(false);
+    } else {
+      setIsLoading(true);
+      await promptAsync();
+    }
   };
 
   const logout = () => {
-
     setParent(null);
     setAccessToken(null);
 
+    if (USE_FAKE_AUTH !== "true") {
+      const returnTo = encodeURIComponent(makeRedirectUri({ useProxy: true }));
+      const logoutUrl =
+        `https://${auth0Domain}/v2/logout?client_id=${auth0ClientId}` +
+        `&returnTo=${returnTo}`;
 
-    const returnTo = encodeURIComponent(makeRedirectUri({ useProxy: true }));
-    const logoutUrl =
-      `https://${auth0Domain}/v2/logout?client_id=${auth0ClientId}` +
-      `&returnTo=${returnTo}`;
-
-    if (typeof window !== "undefined") {
-      window.location.assign(logoutUrl);
-    } else {
-      WebBrowser.openBrowserAsync(logoutUrl);
+      if (typeof window !== "undefined") {
+        window.location.assign(logoutUrl);
+      } else {
+        WebBrowser.openBrowserAsync(logoutUrl);
+      }
     }
   };
 
@@ -136,8 +146,7 @@ export function useAuth() {
 
 
 
-
-
+// import * as WebBrowser from "expo-web-browser";
 // import React, {
 //   createContext,
 //   useContext,
@@ -150,7 +159,6 @@ export function useAuth() {
 //   useAuthRequest,
 //   makeRedirectUri,
 //   ResponseType,
-//   revokeAsync,
 // } from "expo-auth-session";
 
 // interface Parent {
@@ -161,7 +169,7 @@ export function useAuth() {
 // interface AuthContextType {
 //   isLoading: boolean;
 //   login: () => Promise<void>;
-//   logout: () => Promise<void>;
+//   logout: () => void;
 //   parent: Parent | null;
 // }
 
@@ -172,7 +180,6 @@ export function useAuth() {
 //     auth0Domain,
 //     auth0ClientId,
 //     auth0Audience,
-//     redirectUri,
 //   } = Constants.expoConfig!.extra as Record<string, string>;
 
 //   const discovery = {
@@ -196,26 +203,26 @@ export function useAuth() {
 //   const [parent, setParent] = useState<Parent | null>(null);
 //   const [accessToken, setAccessToken] = useState<string | null>(null);
 
+
 //   useEffect(() => {
 //     if (response?.type === "success") {
 //       const token = response.params.access_token!;
 //       setAccessToken(token);
+
 //       (async () => {
 //         try {
-//           // fetch Auth0 profile
+
 //           const uiRes = await fetch(`https://${auth0Domain}/userinfo`, {
 //             headers: { Authorization: `Bearer ${token}` },
 //           });
 //           const ui = await uiRes.json();
 
-//           // register/fetch
+
 //           const apiRes = await fetch(
 //             "https://be-star-step-app-dev.onrender.com/api/parents",
 //             {
 //               method: "POST",
-//               headers: {
-//                 "Content-Type": "application/json",
-//               },
+//               headers: { "Content-Type": "application/json" },
 //               body: JSON.stringify({
 //                 auth0Id: ui.sub,
 //                 parentName: ui.name || "Unnamed Parent",
@@ -234,6 +241,7 @@ export function useAuth() {
 //         }
 //       })();
 //     } else {
+
 //       setIsLoading(false);
 //     }
 //   }, [response]);
@@ -243,14 +251,22 @@ export function useAuth() {
 //     await promptAsync();
 //   };
 
-//   const logout = async () => {
-//     if (accessToken) {
-//       await revokeAsync(
-//         { token: accessToken },
-//         { revocationEndpoint: discovery.revocationEndpoint }
-//       );
-//     }
+//   const logout = () => {
+
 //     setParent(null);
+//     setAccessToken(null);
+
+
+//     const returnTo = encodeURIComponent(makeRedirectUri({ useProxy: true }));
+//     const logoutUrl =
+//       `https://${auth0Domain}/v2/logout?client_id=${auth0ClientId}` +
+//       `&returnTo=${returnTo}`;
+
+//     if (typeof window !== "undefined") {
+//       window.location.assign(logoutUrl);
+//     } else {
+//       WebBrowser.openBrowserAsync(logoutUrl);
+//     }
 //   };
 
 //   return (
@@ -265,8 +281,6 @@ export function useAuth() {
 //   if (!ctx) throw new Error("useAuth must be used within AuthProvider");
 //   return ctx;
 // }
-
-
 
 
 

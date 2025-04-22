@@ -12,6 +12,7 @@ export default {
       auth0Audience: process.env.EXPO_PUBLIC_AUTH0_AUDIENCE,
       redirectUri: "https://starsteps.netlify.app/auth-callback.html",
       eas: { projectId: "c8a1b3ad-3dc4-42fc-a90d-0625eeec160f" },
+      USE_FAKE_AUTH: "true",
     },
     updates: {
       url: "https://u.expo.dev/c8a1b3ad-3dc4-42fc-a90d-0625eeec160f",

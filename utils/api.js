@@ -2,6 +2,7 @@ import axios from "axios";
 
 const apiRequest = axios.create({
   baseURL: "https://be-star-step-app-dev.onrender.com/api/",
+
   headers: {
     "Content-Type": "application/json",
   },
@@ -32,6 +33,12 @@ export const getParentById = (parent_id) => {
     });
 };
 ///KIDS
+
+export const getKidsByParent = (parent_id) => {
+  return apiRequest.get(`kids/parent/${parent_id}`).then(({ data }) => {
+    return data;
+  });
+};
 export const createKidProfile = (parent_id, kidData) => {
   kidData.parentID = [parent_id]; ///string
 
@@ -196,7 +203,6 @@ export const getRewardsByParent = (parent_id) => {
   return apiRequest
     .get(`rewards?createdBy=${parent_id}`)
     .then(({ data }) => {
-      console.log(data);
       return data;
     })
     .catch((err) => {

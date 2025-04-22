@@ -1,6 +1,7 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Pressable, StyleSheet, Text, View } from "react-native";
-import { editKidProfile, editReward } from "../../utils/api";
+import { editKidProfile, editReward, getKidById } from "../../utils/api";
+import { useChild } from "@/contexts/ChildContext";
 
 interface ItemBoxProps {
   reward: {
@@ -20,12 +21,20 @@ export default function ChildsRewardsItem({
   totalStars,
   setTotalStars,
 }: ItemBoxProps) {
-  // When we have contexts replace this with context
-  const childContextTemp = "000000000000000000000002";
+  const { selectedChild } = useChild();
   const [isRequested, setIsRequested] = useState(
-    reward.redeemedBy === childContextTemp
+    reward.redeemedBy === selectedChild._id
   );
   const [requestError, setRequestError] = useState("");
+  // vvvvvvvvvvvvvvvvvvvvvvv use this when we have changed test data (redeemed by)
+  // const [requestedBy, setRequestedBy] = useState("");
+  // useEffect(() => {
+  //   if (reward.redeemedBy !== selectedChild._id && !!reward.redeemedBy) {
+  //     getKidById(reward.redeemedBy).then(({name}) => {
+  //       setRequestedBy(name)
+  //     });
+  //   }
+  // });
   function handleRequestPress(requestedState: boolean) {
     setIsRequested((currRequested) => !currRequested);
     setRequestError("");
@@ -33,7 +42,7 @@ export default function ChildsRewardsItem({
       setTotalStars((totalStars += reward.cost));
       editReward(reward.reward_id, { $unset: { redeemedBy: "" } })
         .then(() => {
-          editKidProfile(childContextTemp, {
+          editKidProfile(selectedChild._id, {
             stars: reward.cost,
           });
         })
@@ -47,9 +56,9 @@ export default function ChildsRewardsItem({
       setIsRequested((currRequested) => !currRequested);
     } else {
       setTotalStars((totalStars -= reward.cost));
-      editReward(reward.reward_id, { redeemedBy: childContextTemp })
+      editReward(reward.reward_id, { redeemedBy: selectedChild._id })
         .then(() => {
-          editKidProfile(childContextTemp, {
+          editKidProfile(selectedChild._id, {
             stars: -reward.cost,
           });
         })
@@ -60,13 +69,13 @@ export default function ChildsRewardsItem({
         });
     }
   }
-  return reward.isRedeemed && reward.redeemedBy !== childContextTemp ? null : (
+  return reward.isRedeemed && reward.redeemedBy !== selectedChild._id ? null : (
     <View>
       <View
         style={
-          reward.isRedeemed && reward.redeemedBy === childContextTemp
+          reward.isRedeemed && reward.redeemedBy === selectedChild._id
             ? styles.redeemed
-            : reward.redeemedBy === childContextTemp || !reward.redeemedBy
+            : reward.redeemedBy === selectedChild._id || !reward.redeemedBy
             ? styles.default
             : styles.greyed
         }
@@ -76,8 +85,8 @@ export default function ChildsRewardsItem({
         <View style={{ width: "40%", alignItems: "flex-end" }}>
           {reward.isRedeemed ? (
             <Text>Redeemed!!!</Text>
-          ) : reward.redeemedBy !== childContextTemp && reward.redeemedBy ? (
-            <Text>Requested by Kid 2</Text>
+          ) : reward.redeemedBy !== selectedChild._id && reward.redeemedBy ? (
+            <Text>Requested by someone else</Text>
           ) : (
             <>
               <Pressable

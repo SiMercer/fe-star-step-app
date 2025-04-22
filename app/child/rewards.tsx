@@ -3,6 +3,8 @@ import { Link } from "expo-router";
 import { useEffect, useState } from "react";
 import ChildsRewardsItem from "./rewardsItem";
 import { getKidById, getRewardsByParent } from "../../utils/api";
+import { useChild } from "@/contexts/ChildContext";
+import { useAuth } from "@/hooks/useAuth";
 
 interface Rewards {
   reward_id: string;
@@ -17,19 +19,32 @@ export default function ChildRewardsScreen() {
   const [listRewards, setListRewards] = useState<Rewards[]>([]);
   const [totalStars, setTotalStars] = useState<number>(0);
   const [isLoading, setIsLoading] = useState<boolean>(true);
+  const { selectedChild } = useChild();
+  const { parent } = useAuth();
   useEffect(() => {
-    setIsLoading(true);
-    getKidById("000000000000000000000002").then(({ stars }) => {
-      setTotalStars(stars);
-      console.log(totalStars);
-    });
-    getRewardsByParent("auth0|test123").then(
-      ({ rewards }: { rewards: Rewards[] }) => {
-        setListRewards(rewards);
-        setIsLoading(false);
-      }
-    );
+    if (selectedChild) {
+      setIsLoading(true);
+      getKidById(selectedChild._id).then(({ stars }) => {
+        setTotalStars(stars);
+      });
+      getRewardsByParent(parent?._id).then(
+        ({ rewards }: { rewards: Rewards[] }) => {
+          setListRewards(rewards);
+          setIsLoading(false);
+        }
+      );
+    }
   }, []);
+  if (!selectedChild) {
+    return (
+      <View style={{ flex: 1, padding: 20 }}>
+        <Text style={{ fontSize: 24, marginTop: 20 }}>Rewards</Text>
+        <Text style={{ fontSize: 18, marginTop: 10, color: "red" }}>
+          No child selected.
+        </Text>
+      </View>
+    );
+  }
   return (
     <View style={{ flex: 1, justifyContent: "space-between", padding: 20 }}>
       <Text style={{ fontSize: 24, marginTop: 20 }}>Rewards</Text>

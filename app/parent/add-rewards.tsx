@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import { View, TextInput, Button, StyleSheet, Alert } from "react-native";
 import ModalSelector from "react-native-modal-selector";
 import { postNewReward } from "@/utils/api";
+import { Link, useRouter } from "expo-router";
 
 type AddRewardFormProps = {
   parentId: "000000000000000000000001";
@@ -91,6 +92,13 @@ export default function AddRewardForm({
         onPress={handleAddReward}
         disabled={!!formError || isSubmitting}
       />
+
+      <View style={styles.navItem}>
+        <Link href="/parent" asChild>
+          <Button title="Parent Dashboard" />
+        </Link>
+      </View>
+
     </View>
   );
 }

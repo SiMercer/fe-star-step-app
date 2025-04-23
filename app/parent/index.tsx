@@ -8,12 +8,14 @@ import {
   ActivityIndicator,
   Image,
 } from "react-native";
-import { Link } from "expo-router";
+import { Link, useRouter } from "expo-router";
 import { useAuth } from "../../hooks/useAuth";
-import ParentTaskCard from "./taskcards"; // Adjust path if needed
-import { getTasksByParent } from "@/utils/api"; // Update path if needed
+import ParentTaskCard from "./taskcards";
+import { getTasksByParent } from "@/utils/api";
+import { FontAwesome } from "@expo/vector-icons";
 
 export default function ParentDashboard() {
+  const router = useRouter();
   const { parent, isLoading, logout } = useAuth();
   const [children, setChildren] = useState([]);
   const [tasks, setTasks] = useState([]);
@@ -46,7 +48,19 @@ export default function ParentDashboard() {
   };
 
   return (
+
+    
     <ScrollView contentContainerStyle={styles.container}>
+
+<TouchableOpacity
+  onPress={() => router.push("/")}
+  style={styles.dashboardIcon}
+>
+  <FontAwesome name="home" size={24} color="#7697F9" />
+</TouchableOpacity>
+
+
+
       <Text style={styles.title}>Parent Dashboard</Text>
 
       {isLoading ? (
@@ -213,5 +227,18 @@ const styles = StyleSheet.create({
   logoutText: {
     color: "#000",
     fontWeight: "600",
+  },
+  dashboardIcon: {
+    position: "absolute",
+    top: 20,
+    left: 20,
+    backgroundColor: "#FFFEFF",
+    padding: 10,
+    borderRadius: 20,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.1,
+    shadowRadius: 2,
+    elevation: 2,
   },
 });

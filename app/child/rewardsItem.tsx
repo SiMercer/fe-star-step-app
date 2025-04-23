@@ -26,15 +26,14 @@ export default function ChildsRewardsItem({
     reward.redeemedBy === selectedChild._id
   );
   const [requestError, setRequestError] = useState("");
-  // vvvvvvvvvvvvvvvvvvvvvvv use this when we have changed test data (redeemed by)
-  // const [requestedBy, setRequestedBy] = useState("");
-  // useEffect(() => {
-  //   if (reward.redeemedBy !== selectedChild._id && !!reward.redeemedBy) {
-  //     getKidById(reward.redeemedBy).then(({name}) => {
-  //       setRequestedBy(name)
-  //     });
-  //   }
-  // });
+  const [requestedBy, setRequestedBy] = useState("");
+  useEffect(() => {
+    if (reward.redeemedBy !== selectedChild._id && !!reward.redeemedBy) {
+      getKidById(reward.redeemedBy).then(({ name }) => {
+        setRequestedBy(name);
+      });
+    }
+  });
   function handleRequestPress(requestedState: boolean) {
     setIsRequested((currRequested) => !currRequested);
     setRequestError("");
@@ -84,9 +83,9 @@ export default function ChildsRewardsItem({
         <Text style={{ alignSelf: "center" }}>{reward.cost + "⭐"}</Text>
         <View style={{ width: "40%", alignItems: "flex-end" }}>
           {reward.isRedeemed ? (
-            <Text>Redeemed!!!</Text>
+            <Text>🎉 Redeemed!!!</Text>
           ) : reward.redeemedBy !== selectedChild._id && reward.redeemedBy ? (
-            <Text>Requested by someone else</Text>
+            <Text>🔒 Requested by {requestedBy}</Text>
           ) : (
             <>
               <Pressable
@@ -98,7 +97,7 @@ export default function ChildsRewardsItem({
                 ></View>
               </Pressable>
               <View>
-                <Text>{isRequested ? "Requested!" : "Request?"}</Text>
+                <Text>{isRequested ? "⌛ Waiting" : "🖐️ Request"}</Text>
               </View>
             </>
           )}
@@ -112,37 +111,35 @@ const styles = StyleSheet.create({
   default: {
     height: 70,
     width: "100%",
-    padding: 10,
-    marginBottom: 5,
-    borderWidth: 5,
-    borderColor: "#000",
+    padding: 16,
+    marginBottom: 15,
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
+    borderRadius: 8,
+    backgroundColor: "#D1DBFF",
   },
   redeemed: {
     height: 70,
     width: "100%",
-    padding: 10,
-    marginBottom: 5,
-    borderWidth: 5,
-    borderColor: "#000",
+    padding: 16,
+    marginBottom: 15,
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
-    backgroundColor: "#0f0",
+    backgroundColor: "#77DD77",
+    borderRadius: 8,
   },
   greyed: {
     height: 70,
     width: "100%",
-    padding: 10,
-    marginBottom: 5,
-    borderWidth: 5,
-    borderColor: "#000",
+    padding: 16,
+    marginBottom: 15,
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
-    backgroundColor: "#aaa",
+    borderRadius: 8,
+    backgroundColor: "#ddd",
   },
   slider: {
     height: 12,

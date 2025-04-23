@@ -7,7 +7,7 @@ export default {
     sdkVersion: "52.0.0",
     userInterfaceStyle: "automatic",
     platforms: ["ios", "android", "web"],
-    plugins: ["expo-secure-store"],
+    plugins: ["expo-secure-store", "expo-font"],
     extra: {
       auth0Domain: process.env.EXPO_PUBLIC_AUTH0_DOMAIN,
       auth0ClientId: process.env.EXPO_PUBLIC_AUTH0_CLIENT_ID,

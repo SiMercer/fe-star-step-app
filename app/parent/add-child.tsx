@@ -8,6 +8,7 @@ import {
   ActivityIndicator,
   TextInput,
   Image,
+  Pressable,
 } from "react-native";
 import { useRouter } from "expo-router";
 import { useAuth } from "../../hooks/useAuth";
@@ -59,73 +60,122 @@ export default function ParentAddChildScreen() {
   // console.log(img, age, name);
   return (
     <View style={styles.container}>
-      {!parent ? (
-        <Button title="Log In First" onPress={login} />
-      ) : (
-        <>
-          {/* <Button title="Add Default Child" onPress={handleAddDefaultChild} /> */}
-          <View style={{ marginTop: 16 }}>
-            <Button
-              title="Back to Dashboard"
-              onPress={() => router.push("/parent")}
+      <View style={styles.containerLighter}>
+        <Pressable
+          onPress={() => router.push("/parent")}
+          style={{ alignItems: "flex-end" }}
+        >
+          <View
+            style={{
+              width: 30,
+              height: 30,
+
+              borderRadius: 25,
+            }}
+          >
+            <Text style={{ fontSize: 30 }}>↪️</Text>
+          </View>
+        </Pressable>
+        <View style={styles.headerContainer}>
+          <View>
+            <Text style={{ fontSize: 30 }}>⭐️</Text>
+          </View>
+          <View style={styles.header}>
+            <Text
+              style={{
+                fontFamily: "Titles",
+                fontSize: 35,
+                color: "#7697F9",
+                fontWeight: "bold",
+              }}
+            >
+              Create kid account
+            </Text>
+          </View>
+          <View>
+            <Text style={{ fontSize: 30 }}>⭐️</Text>
+          </View>
+        </View>
+        <View style={styles.nameAgeContainer}>
+          <View style={styles.kidNameContainer}>
+            <View
+              style={{
+                justifyContent: "center",
+                alignItems: "center",
+              }}
+            >
+              <Text style={styles.inputLabel}>Kid's name:</Text>
+            </View>
+            <TextInput
+              value={name}
+              // placeholder="kid name"
+              style={styles.inputStyle}
+              onChangeText={(value) => {
+                setName(value);
+              }}
             />
           </View>
-        </>
-      )}
-      <View>
-        <View style={styles.header}>
-          <Text>Create kid account</Text>
+          <View style={styles.kidAgeContainer}>
+            <View
+              style={{
+                justifyContent: "center",
+                alignItems: "center",
+              }}
+            >
+              <Text style={styles.inputLabel}>Kid's age:</Text>
+              <TextInput
+                // placeholder="kid's age"
+                style={styles.inputStyle}
+                onChangeText={(value) => {
+                  setAge(value);
+                }}
+                value={age}
+              />
+            </View>
+          </View>
         </View>
-        <View style={styles.kidNameContainer}>
-          <Text>Kid's name:</Text>
-          <TextInput
-            value={name}
-            placeholder="kid name"
-            style={{ backgroundColor: "pink" }}
-            onChangeText={(value) => {
-              setName(value);
-            }}
-          />
-        </View>
-        <View style={styles.kidAgeContainer}>
-          <Text>Kid's age:</Text>
-          <TextInput
-            placeholder="kid's age"
-            style={{ backgroundColor: "pink" }}
-            onChangeText={(value) => {
-              setAge(value);
-            }}
-            value={age}
-          />
-        </View>
-        <View>
-          <Text>Choose avatar</Text>
-        </View>
-        <View style={styles.avatarContainer}>
-          <TextInput
-            placeholder="paste the link here"
-            value={img}
-            style={{ backgroundColor: "pink" }}
-            onChangeText={(value) => {
-              setImg(value);
-            }}
-          />
 
-          {img ? (
-            <View>
-              <Image source={{ uri: img }} style={styles.avatar} />
-            </View>
-          ) : (
-            <View>
-              <Image
-                source={require("../../assets/images/react-logo.png")}
-                style={styles.avatar}
-              ></Image>
-            </View>
-          )}
+        <View style={styles.avatarLabelInput}>
+          <View>
+            <Text style={styles.inputLabel}>Choose kid's avatar</Text>
+          </View>
+          <View style={styles.avatarContainer}>
+            <TextInput
+              placeholder="paste the link here"
+              value={img}
+              style={styles.inputStyle}
+              onChangeText={(value) => {
+                setImg(value);
+              }}
+            />
+          </View>
         </View>
-        <View>
-          <Button title="Create Kid's account" onPress={createKidsAcc} />
+        {img ? (
+          <View style={styles.imgContainer}>
+            <Image source={{ uri: img }} style={styles.avatar} />
+          </View>
+        ) : (
+          <View style={styles.imgContainer}>
+            <Image
+              source={require("../../assets/icons/logoStar.png")}
+              style={styles.avatar}
+            ></Image>
+          </View>
+        )}
+        <View style={{ alignItems: "center" }}>
+          <Pressable
+            className="buttonCreate"
+            onPress={createKidsAcc}
+            style={styles.buttonCreate}
+          >
+            <View>
+              <Text
+                style={{ color: "#FFFEFF", fontFamily: "Titles", fontSize: 22 }}
+              >
+                Create Kid's account{" "}
+              </Text>
+            </View>
+          </Pressable>
         </View>
       </View>
     </View>
@@ -134,31 +184,123 @@ export default function ParentAddChildScreen() {
 
 const styles = StyleSheet.create({
   container: {
-    flex: 1,
-    padding: 24,
-    justifyContent: "center",
-    alignItems: "center",
-    backgroundColor: "#fff",
+    padding: 20,
+    width: "100%",
+    backgroundColor: "#D1DBFF",
+    flexDirection: "column",
+    height: "100%",
   },
-  heading: { fontSize: 24, fontWeight: "bold", marginBottom: 12 },
-  avatar: { height: 200, width: 200 },
+  containerLighter: {
+    padding: 20,
+    width: "100%",
+    gap: 30,
+    backgroundColor: "#EBECFF",
+    flexDirection: "column",
+    borderRadius: 15,
+    height: "100%",
+  },
+
+  headerContainer: {
+    width: "98%",
+    flexDirection: "row-reverse",
+    justifyContent: "space-around",
+    alignItems: "center",
+  },
   header: {
-    display: "flex",
-    backgroundColor: "grey",
+    flexShrink: 1,
+    width: "98%",
+    marginTop: 10,
+    marginBottom: 30,
     height: 30,
     alignItems: "center",
     justifyContent: "center",
   },
-  kidNameContainer: {
-    height: 50,
-    display: "flex",
+  nameAgeContainer: {
+    alignItems: "center",
+
+    flexDirection: "row",
+    gap: 10,
+    justifyContent: "center",
   },
+  kidNameContainer: {
+    width: "48%",
+    justifyContent: "center",
+    backgroundColor: "#FFFEFF",
+    height: 100,
+
+    flexDirection: "column",
+    borderRadius: 15,
+    alignContent: "center",
+    padding: 10,
+  },
+
   kidAgeContainer: {
+    width: "48%",
+    padding: 10,
+    justifyContent: "center",
+    backgroundColor: "#FFFEFF",
+    height: 100,
+    overflow: "hidden",
+    flexDirection: "column",
+    borderRadius: 15,
+    alignContent: "center",
+  },
+  inputStyle: {
+    width: "98%",
+    fontFamily: "BubbleFont",
+    borderRadius: 15,
     height: 50,
-    display: "flex",
+    backgroundColor: "#FFA1C6",
+    fontSize: 22,
+  },
+  avatarAndFormContainer: {
+    alignItems: "center",
+
+    flexDirection: "row",
+    gap: 10,
+    justifyContent: "center",
+    height: 200,
+  },
+  avatarLabelInput: {
+    padding: 10,
+    justifyContent: "center",
+    backgroundColor: "#FFFEFF",
+    height: 100,
+    flexDirection: "column",
+    borderRadius: 15,
+    alignContent: "center",
+  },
+  inputLabel: {
+    fontFamily: "Titles",
+    fontSize: 22,
+    color: "#7697F9",
   },
   avatarContainer: {
     height: 50,
-    display: "flex",
+  },
+  avatar: {
+    width: 150,
+    height: 150,
+    borderRadius: 79,
+    overflow: "hidden",
+    borderColor: "yellow",
+    justifyContent: "center",
+    alignItems: "center",
+    borderWidth: 2,
+  },
+  imgContainer: {
+    alignItems: "center",
+  },
+  // createProfileContainer: {
+  //   alignItems: "center",
+
+  // },
+  buttonCreate: {
+    backgroundColor: "#7697F9",
+    width: "90%",
+    height: 50,
+    borderRadius: 15,
+    alignItems: "center",
+    justifyContent: "center",
   },
 });

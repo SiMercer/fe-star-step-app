@@ -15,6 +15,9 @@ SplashScreen.preventAutoHideAsync();
 export default function RootLayout() {
   const [fontsLoaded] = useFonts({
     Poppins: require("../assets/fonts/Poppins/Poppins-Bold.ttf"),
+    Titles: require("../assets/fonts/Gluten-ExtraBold.ttf"),
+    BubbleFont: require("../assets/fonts/Gluten-VariableFont.ttf"),
+    H2: require("../assets/fonts/Gluten-Bold.ttf"),
   });
 
   useEffect(() => {

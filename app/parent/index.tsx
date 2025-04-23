@@ -22,10 +22,12 @@ export default function ParentDashboard() {
 
   useEffect(() => {
     if (parent?._id) {
-      fetch(`https://be-star-step-app-dev.onrender.com/api/kids/parent/${parent._id}`)
-        .then(res => res.json())
-        .then(data => setChildren(data))
-        .catch(err => console.error("Failed to load children:", err));
+      fetch(
+        `https://be-star-step-app-dev.onrender.com/api/kids/parent/${parent._id}`
+      )
+        .then((res) => res.json())
+        .then((data) => setChildren(data))
+        .catch((err) => console.error("Failed to load children:", err));
     }
   }, [parent]);
 
@@ -44,22 +46,17 @@ export default function ParentDashboard() {
   }, [parent]);
 
   const handleTaskDeleted = (taskId: string) => {
-    setTasks(tasks.filter(task => task._id !== taskId));
+    setTasks(tasks.filter((task) => task._id !== taskId));
   };
 
   return (
-
-    
     <ScrollView contentContainerStyle={styles.container}>
-
-<TouchableOpacity
-  onPress={() => router.push("/")}
-  style={styles.dashboardIcon}
->
-  <FontAwesome name="home" size={24} color="#7697F9" />
-</TouchableOpacity>
-
-
+      <TouchableOpacity
+        onPress={() => router.push("/")}
+        style={styles.dashboardIcon}
+      >
+        <FontAwesome name="home" size={24} color="#7697F9" />
+      </TouchableOpacity>
 
       <Text style={styles.title}>Parent Dashboard</Text>
 
@@ -93,7 +90,9 @@ export default function ParentDashboard() {
 
           <Link href="/parent/rewards" asChild>
             <TouchableOpacity style={styles.rewardsButton}>
-              <Text style={styles.rewardsButtonText}>Rewards exchange list</Text>
+              <Text style={styles.rewardsButtonText}>
+                Rewards exchange list
+              </Text>
             </TouchableOpacity>
           </Link>
 
@@ -102,7 +101,11 @@ export default function ParentDashboard() {
           <View style={{ width: "100%" }}>
             {tasks.length > 0 ? (
               tasks.map((task) => (
-                <ParentTaskCard key={task._id} task={task} onDelete={handleTaskDeleted} />
+                <ParentTaskCard
+                  key={task._id}
+                  task={task}
+                  onDelete={handleTaskDeleted}
+                />
               ))
             ) : (
               <Text>No tasks available</Text>

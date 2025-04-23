@@ -1,74 +1,68 @@
 import { Link } from "expo-router";
-import { Text, TouchableOpacity } from "react-native";
+import { StyleSheet, Text, TouchableOpacity } from "react-native";
 import { Button } from "react-native";
 import { View } from "react-native";
 
 export default function NavBarKid() {
   return (
-    <View
-      style={{
-        display: "flex",
-        flexDirection: "row",
-        width: "90%",
-        justifyContent: "center",
-        position: "fixed",
-        bottom: "10px",
-      }}
-    >
-      <View
-        style={{
-          flexDirection: "row",
-          justifyContent: "space-around",
-          marginBottom: 20,
-          width: "100%",
-        }}
-      >
-        <Link href="/child" asChild>
-          <TouchableOpacity
-            onPress={() => {}}
-            style={{
-              width: 200,
-              height: 80,
-              display: "flex",
-              justifyContent: "center",
-              alignItems: "center",
-              backgroundColor: "#FFA1C6",
-            }}
-          >
-            <Text>Dashboard</Text>
-          </TouchableOpacity>
-        </Link>
-        <Link href="/child/tasks" asChild>
-          <TouchableOpacity
-            onPress={() => {}}
-            style={{
-              width: 150,
-              height: 80,
-              display: "flex",
-              justifyContent: "center",
-              alignItems: "center",
-              backgroundColor: "#FFA1C6",
-            }}
-          >
-            <Text>Tasks</Text>
-          </TouchableOpacity>
-        </Link>
-        <Link href="/child/rewards" asChild>
-          <TouchableOpacity
-            onPress={() => {}}
-            style={{
-              width: 150,
-              height: 80,
-              display: "flex",
-              justifyContent: "center",
-              alignItems: "center",
-              backgroundColor: "#FFA1C6",
-            }}
-          >
-            <Text>Rewards</Text>
-          </TouchableOpacity>
-        </Link>
-      </View>
+    <View style={styles.main}>
+      <Link href="/child" asChild>
+        <TouchableOpacity onPress={() => {}} style={styles.dashboardButton}>
+          <Text style={styles.text}>Dashboard</Text>
+        </TouchableOpacity>
+      </Link>
+      <Link href="/child/tasks" asChild>
+        <TouchableOpacity onPress={() => {}} style={styles.tasksButton}>
+          <Text style={styles.text}>Tasks</Text>
+        </TouchableOpacity>
+      </Link>
+      <Link href="/child/rewards" asChild>
+        <TouchableOpacity onPress={() => {}} style={styles.rewardsButton}>
+          <Text style={styles.text}>Rewards</Text>
+        </TouchableOpacity>
+      </Link>
     </View>
   );
 }
+const styles = StyleSheet.create({
+  main: {
+    flexShrink: 1,
+    flexDirection: "row",
+    // width: "100%",
+    justifyContent: "center",
+    gap: 3,
+    position: "absolute",
+    bottom: 0,
+    left: 0,
+    right: 0,
+  },
+  dashboardButton: {
+    borderBottomLeftRadius: 15,
+    borderTopLeftRadius: 15,
+    width: "40%",
+    height: 80,
+    display: "flex",
+    justifyContent: "center",
+    alignItems: "center",
+    backgroundColor: "#7697F9",
+  },
+  tasksButton: {
+    width: "30%",
+    height: 80,
+    display: "flex",
+    justifyContent: "center",
+    alignItems: "center",
+    backgroundColor: "#7697F9",
+  },
+  rewardsButton: {
+    borderBottomRightRadius: 15,
+    borderTopRightRadius: 15,
+    width: "30%",
+    height: 80,
+    display: "flex",
+    justifyContent: "center",
+    alignItems: "center",
+    backgroundColor: "#7697F9",
+  },
+  text: { fontFamily: "H2", color: "#FFFEFF", fontSize: 20 },
+});

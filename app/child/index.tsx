@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { View, Text, Button, Image, StyleSheet } from "react-native";
+import { View, Text, Button, Image, StyleSheet, Pressable } from "react-native";
 import { useRouter, Link } from "expo-router";
 import { getRewardsByParent, getTasksByParent } from "@/utils/api";
 import NavBarKid from "./NavBarKid";
@@ -44,63 +44,172 @@ export default function ChildDashboardScreen() {
   console.log(rewards);
   return (
     <View style={styles.main}>
-      <View style={styles.backButtonContainer}>
-        <Link href="/" asChild>
-          <Button title="Back" onPress={() => {}} />
-        </Link>
-      </View>
-      <View style={styles.headerContainer}>
-        <Image source={{ uri: kid.avatar }} style={styles.avatar}></Image>
-        <Text style={{ fontSize: 24, marginTop: 20 }}>
-          {kid.name}'s Dashboard
-        </Text>
-      </View>
-      <View style={styles.starsContainer}>
-        <Text>{kid.stars} ⭐️</Text>
-      </View>
-      <View style={styles.rewardTasksContainer}>
-        <Link href="/child/rewards" asChild>
-          <View style={styles.rewardContainer}>
-            <Text>
-              {rewards.length <= 1
-                ? `${rewards.length} reward available for  you today`
-                : `${rewards.length} rewards  available for you today`}
+      <View style={styles.containerLighter}>
+        <Pressable
+          onPress={() => router.push("/")}
+          style={{ alignItems: "flex-end" }}
+        >
+          <View
+            style={{
+              width: 30,
+              height: 30,
+
+              borderRadius: 25,
+            }}
+          >
+            <Text style={{ fontSize: 30 }}>↪️</Text>
+          </View>
+        </Pressable>
+        <View style={styles.headerContainer}>
+          <Image source={{ uri: kid.avatar }} style={styles.avatar}></Image>
+          <Text
+            style={{
+              fontFamily: "Titles",
+              fontSize: 35,
+              color: "#7697F9",
+              fontWeight: "bold",
+            }}
+          >
+            {kid.name}'s Dashboard
+          </Text>
+        </View>
+        <View style={{ alignItems: "center", height: "20%" }}>
+          <View style={styles.starsContainer}>
+            <Text
+              style={{
+                fontFamily: "Titles",
+                fontSize: 35,
+                color: "#FFFEFF",
+                fontWeight: "bold",
+              }}
+            >
+              You have
+            </Text>
+            <Text
+              style={{
+                fontFamily: "Titles",
+                fontSize: 35,
+                color: "#FFFEFF",
+                fontWeight: "bold",
+              }}
+            >
+              {kid.stars} ⭐️ !
             </Text>
           </View>
-        </Link>
-        <Link href="/child/tasks" asChild>
-          <View style={styles.taskContainer}>
-            <Text>
-              {tasks.length <= 1
-                ? `${tasks.length} task for today`
-                : `${tasks.length} tasks for today`}
-            </Text>
-          </View>
-        </Link>
+        </View>
+        <View style={styles.rewardTasksContainer}>
+          <Link href="/child/rewards" asChild>
+            <View style={styles.rewardContainer}>
+              <View
+                style={{
+                  flexDirection: "column",
+                  gap: "20px",
+                  alignItems: "center",
+                }}
+              >
+                <View
+                  style={{
+                    flexDirection: "row",
+                    alignItems: "flex-end",
+                    justifyContent: "space-around",
+                    gap: 10,
+                  }}
+                >
+                  <Text
+                    style={{
+                      fontFamily: "H2",
+                      color: "#FFA1C6",
+                      fontSize: 50,
+                    }}
+                  >
+                    {rewards.length}
+                  </Text>
+                  <Image
+                    source={require("../../assets/icons/128/gift128.png")}
+                    style={{ width: 50, height: 60, resizeMode: "contain" }}
+                  />
+                </View>
+                <Text
+                  style={{ fontFamily: "H2", color: "#565F7D", fontSize: 20 }}
+                >
+                  available for you
+                </Text>
+                <Text
+                  style={{ fontFamily: "H2", color: "#565F7D", fontSize: 20 }}
+                >
+                  today
+                </Text>
+              </View>
+            </View>
+          </Link>
+          <Link href="/child/tasks" asChild>
+            <View style={styles.taskContainer}>
+              <View style={{ alignItems: "center" }}>
+                <Text
+                  style={{
+                    fontFamily: "Titles",
+                    color: "#FFA1C6",
+                    fontSize: 50,
+                    fontWeight: "bold",
+                  }}
+                >
+                  {tasks.length}
+                </Text>
+                <Text
+                  style={{
+                    fontFamily: "Titles",
+                    fontSize: 35,
+                    color: "#7697F9",
+                    fontWeight: "bold",
+                  }}
+                >
+                  tasks
+                </Text>
+                <Text
+                  style={{ fontFamily: "H2", color: "#565F7D", fontSize: 20 }}
+                >
+                  for today
+                </Text>
+              </View>
+            </View>
+          </Link>
+        </View>
+        <NavBarKid></NavBarKid>
       </View>
-      <NavBarKid></NavBarKid>
     </View>
   );
 }
 const styles = StyleSheet.create({
   main: {
-    backgroundColor: "#EBECFF",
+    flexShrink: 1,
+    padding: 20,
+    width: "100%",
+    backgroundColor: "#D1DBFF",
+    flexDirection: "column",
     height: "100%",
-    display: "flex",
+  },
+  containerLighter: {
+    padding: 20,
+    width: "100%",
+    gap: 20,
+    backgroundColor: "#EBECFF",
+    flexDirection: "column",
+    borderRadius: 15,
+    height: "100%",
+  },
+  headerContainer: {
+    width: "98%",
+    flexDirection: "row",
+    justifyContent: "space-around",
     alignItems: "center",
   },
+
   backButtonContainer: {
     flexDirection: "row",
     justifyContent: "space-around",
     marginBottom: 20,
   },
-  headerContainer: {
-    marginTop: 30,
-    width: "90%",
-    display: "flex",
-    flexDirection: "row",
-    justifyContent: "space-evenly",
-  },
+
   avatar: {
     width: 100,
     height: 100,
@@ -115,16 +224,16 @@ const styles = StyleSheet.create({
     display: "flex",
     alignContent: "center",
     alignItems: "center",
-    backgroundColor: "#D1DBFF",
-    borderRadius: "15px",
-    height: "20%",
+    backgroundColor: "#FFA1C6",
+    borderRadius: 15,
+    height: "100%",
     justifyContent: "center",
-    width: "90%",
+    width: "100%",
     marginTop: 30,
   },
 
   rewardTasksContainer: {
-    width: "90%",
+    width: "100%",
     display: "flex",
     flexDirection: "row",
     justifyContent: "space-between",
@@ -133,8 +242,8 @@ const styles = StyleSheet.create({
     display: "flex",
     alignContent: "center",
     alignItems: "center",
-    backgroundColor: "#D1DBFF",
-    borderRadius: "15px",
+    backgroundColor: "#FFFEFF",
+    borderRadius: 15,
     justifyContent: "center",
     height: 200,
     width: "45%",
@@ -144,8 +253,8 @@ const styles = StyleSheet.create({
     display: "flex",
     alignContent: "center",
     alignItems: "center",
-    backgroundColor: "#D1DBFF",
-    borderRadius: "15px",
+    backgroundColor: "#FFFEFF",
+    borderRadius: 15,
     justifyContent: "center",
     height: 200,
     width: "45%",

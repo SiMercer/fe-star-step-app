@@ -60,11 +60,6 @@ export default function ParentDashboard() {
           <Button title="Rewards" />
         </Link>
       </View>
-
-          <Button title="Add a Child" />
-        </Link>
-      </View>
-
     </ScrollView>
   );
 }

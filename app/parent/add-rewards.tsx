@@ -98,7 +98,6 @@ export default function AddRewardForm({
           <Button title="Parent Dashboard" />
         </Link>
       </View>
-
     </View>
   );
 }

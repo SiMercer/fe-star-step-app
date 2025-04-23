@@ -4,7 +4,7 @@ import {
   Text,
   StyleSheet,
   TextInput,
-  Button,
+  TouchableOpacity,
   Alert,
   ActivityIndicator,
   ScrollView,
@@ -13,6 +13,15 @@ import RNPickerSelect from "react-native-picker-select";
 import { router } from "expo-router";
 import DateTimePicker from "@react-native-community/datetimepicker";
 import { getKidByParentId, postNewTask } from "@/utils/api";
+import { FontAwesome } from "@expo/vector-icons";
+
+const COLORS = {
+  pink: "#FFA1C6",
+  lightBlue: "#D1DBFF",
+  darkBlue: "#7697F9",
+  white: "#FFFEFF",
+  offWhite: "#EBECFF",
+};
 
 interface Child {
   _id: string;
@@ -39,8 +48,7 @@ export default function AddTaskScreen({ parentID }: AddTaskScreenProps) {
       try {
         const childrenData = await getKidByParentId("local-test-id");
         setChildren(childrenData);
-
-        setAssignedTo(childrenData[0]._id); // Set default to first child
+        setAssignedTo(childrenData[0]?._id || "");
       } catch (error) {
         console.error("Error fetching children:", error);
         Alert.alert("Error", "Failed to load children");
@@ -52,14 +60,12 @@ export default function AddTaskScreen({ parentID }: AddTaskScreenProps) {
     fetchChildren();
   }, [parentID]);
 
-  // Handle date change
   const onChangeDate = (event: any, selectedDate?: Date) => {
     const currentDate = selectedDate || validBefore;
     setShowDatePicker(false);
     setValidBefore(currentDate);
   };
 
-  // Handle form submission
   const handleSubmit = async () => {
     if (!title.trim()) {
       Alert.alert("Error", "Please enter a task title");
@@ -76,15 +82,12 @@ export default function AddTaskScreen({ parentID }: AddTaskScreenProps) {
     try {
       const newTask = {
         title,
-        starsReward: Number(starsReward),
+        starsReward: Number(starsReward) || 1,
         validBefore: validBefore.toISOString(),
         status: "new",
       };
-      console.log("Payload being sent:", newTask);
 
-      const data = await postNewTask("local-test-id", assignedTo, newTask);
-      console.log(assignedTo);
-      console.log(data);
+      await postNewTask("local-test-id", assignedTo, newTask);
       Alert.alert("Success", "Task added successfully!", [
         { text: "OK", onPress: () => router.back() },
       ]);
@@ -99,7 +102,7 @@ export default function AddTaskScreen({ parentID }: AddTaskScreenProps) {
   if (isLoadingChildren) {
     return (
       <View style={[styles.container, styles.center]}>
-        <ActivityIndicator size="large" />
+        <ActivityIndicator size="large" color={COLORS.darkBlue} />
       </View>
     );
   }
@@ -107,117 +110,175 @@ export default function AddTaskScreen({ parentID }: AddTaskScreenProps) {
   if (children.length === 0) {
     return (
       <View style={[styles.container, styles.center]}>
+        <FontAwesome name="child" size={48} color={COLORS.pink} />
         <Text style={styles.errorText}>No children found</Text>
-        <Button title="Go Back" onPress={() => router.back()} />
+        <TouchableOpacity
+          style={styles.backButton}
+          onPress={() => router.back()}
+        >
+          <Text style={styles.backButtonText}>Go Back</Text>
+        </TouchableOpacity>
       </View>
     );
   }
+
   return (
-    <ScrollView contentContainerStyle={styles.container}>
-      <Text style={styles.title}>Add New Task</Text>
+    <View style={styles.screenContainer}>
+      <TouchableOpacity onPress={() => router.back()} style={styles.backIcon}>
+        <FontAwesome name="arrow-left" size={24} color={COLORS.darkBlue} />
+      </TouchableOpacity>
 
-      <View style={styles.formGroup}>
-        <Text style={styles.label}>Task Title*</Text>
-        <TextInput
-          style={styles.input}
-          placeholder="What needs to be done?"
-          value={title}
-          onChangeText={setTitle}
-          maxLength={100}
-        />
-      </View>
+      <ScrollView contentContainerStyle={styles.container}>
+        <Text style={styles.title}>Add New Task</Text>
 
-      <View style={styles.formGroup}>
-        <Text style={styles.label}>Assign To*</Text>
-        <View style={styles.pickerContainer}>
-          <RNPickerSelect
-            onValueChange={(value) => setAssignedTo(value)}
-            items={children.map((child) => ({
-              label: child.name,
-              value: child._id,
-              key: child._id,
-            }))}
-            value={assignedTo}
-            placeholder={{}}
-            style={pickerSelectStyles}
-            useNativeAndroidPickerStyle={false}
+        <View style={styles.formGroup}>
+          <Text style={styles.label}>Task Title*</Text>
+          <TextInput
+            style={styles.input}
+            placeholder="What needs to be done?"
+            placeholderTextColor="#888"
+            value={title}
+            onChangeText={setTitle}
+            maxLength={100}
           />
         </View>
-      </View>
 
-      <View style={styles.formGroup}>
-        <Text style={styles.label}>Star Reward*</Text>
-        <TextInput
-          style={styles.input}
-          placeholder="How many stars is this worth?"
-          keyboardType="number-pad"
-          value={starsReward}
-          onChangeText={(text) => setStarsRewards(text.replace(/[^0-9]/g, ""))}
-        />
-        <Text style={styles.hint}>Minimum 1 star</Text>
-      </View>
+        <View style={styles.formGroup}>
+          <Text style={styles.label}>Assign To*</Text>
+          <View style={styles.pickerContainer}>
+            <RNPickerSelect
+              onValueChange={(value) => setAssignedTo(value)}
+              items={children.map((child) => ({
+                label: child.name,
+                value: child._id,
+                key: child._id,
+              }))}
+              value={assignedTo}
+              placeholder={{}}
+              style={pickerSelectStyles}
+              useNativeAndroidPickerStyle={false}
+            />
+          </View>
+        </View>
 
-      <View style={styles.formGroup}>
-        <Text style={styles.label}>Due Date*</Text>
-        <Button
-          title={validBefore.toLocaleDateString()}
-          onPress={() => setShowDatePicker(true)}
-        />
-        {showDatePicker && (
-          <DateTimePicker
-            value={validBefore}
-            mode="date"
-            display="default"
-            onChange={onChangeDate}
-            minimumDate={new Date()}
+        <View style={styles.formGroup}>
+          <Text style={styles.label}>Star Reward*</Text>
+          <TextInput
+            style={styles.input}
+            placeholder="How many stars is this worth?"
+            placeholderTextColor="#888"
+            keyboardType="number-pad"
+            value={starsReward}
+            onChangeText={(text) =>
+              setStarsRewards(text.replace(/[^0-9]/g, ""))
+            }
           />
-        )}
-      </View>
+          <Text style={styles.hint}>Minimum 1 star</Text>
+        </View>
 
-      <View style={styles.buttonContainer}>
-        <Button title="Cancel" onPress={() => router.back()} color="#999" />
-        <Button
-          title={isSubmitting ? "Adding..." : "Add Task"}
-          onPress={handleSubmit}
-          disabled={isSubmitting || !title.trim() || !assignedTo}
-        />
-      </View>
-    </ScrollView>
+        <View style={styles.formGroup}>
+          <Text style={styles.label}>Due Date*</Text>
+          <TouchableOpacity
+            style={styles.dateButton}
+            onPress={() => setShowDatePicker(true)}
+          >
+            <FontAwesome name="calendar" size={18} color={COLORS.darkBlue} />
+            <Text style={styles.dateButtonText}>
+              {validBefore.toLocaleDateString()}
+            </Text>
+          </TouchableOpacity>
+          {showDatePicker && (
+            <DateTimePicker
+              value={validBefore}
+              mode="date"
+              display="default"
+              onChange={onChangeDate}
+              minimumDate={new Date()}
+            />
+          )}
+        </View>
+
+        <View style={styles.buttonContainer}>
+          <TouchableOpacity
+            style={[styles.button, styles.cancelButton]}
+            onPress={() => router.back()}
+          >
+            <Text style={styles.buttonText}>Cancel</Text>
+          </TouchableOpacity>
+          <TouchableOpacity
+            style={[
+              styles.button,
+              styles.submitButton,
+              (isSubmitting || !title.trim() || !assignedTo) &&
+                styles.disabledButton,
+            ]}
+            onPress={handleSubmit}
+            disabled={isSubmitting || !title.trim() || !assignedTo}
+          >
+            {isSubmitting ? (
+              <ActivityIndicator color={COLORS.white} />
+            ) : (
+              <Text style={styles.buttonText}>Add Task</Text>
+            )}
+          </TouchableOpacity>
+        </View>
+      </ScrollView>
+    </View>
   );
 }
+
 const pickerSelectStyles = StyleSheet.create({
   inputIOS: {
     fontSize: 16,
-    paddingVertical: 12,
-    paddingHorizontal: 10,
+    paddingVertical: 14,
+    paddingHorizontal: 12,
     borderWidth: 1,
-    borderColor: "#ccc",
-    borderRadius: 4,
-    color: "black",
-    paddingRight: 30, // to ensure the text is never behind the icon
+    borderColor: COLORS.lightBlue,
+    borderRadius: 10,
+    color: COLORS.darkBlue,
+    paddingRight: 30,
+    backgroundColor: COLORS.white,
   },
   inputAndroid: {
     fontSize: 16,
-    paddingHorizontal: 10,
-    paddingVertical: 8,
+    paddingHorizontal: 12,
+    paddingVertical: 12,
     borderWidth: 1,
-    borderColor: "#ccc",
-    borderRadius: 4,
-    color: "black",
-    paddingRight: 30, // to ensure the text is never behind the icon
+    borderColor: COLORS.lightBlue,
+    borderRadius: 10,
+    color: COLORS.darkBlue,
+    paddingRight: 30,
+    backgroundColor: COLORS.white,
   },
 });
 
 const styles = StyleSheet.create({
+  screenContainer: {
+    flex: 1,
+    backgroundColor: COLORS.offWhite,
+    paddingTop: 50,
+  },
+  backIcon: {
+    position: "absolute",
+    top: 15,
+    left: 15,
+    zIndex: 10,
+    padding: 10,
+    backgroundColor: COLORS.white,
+    borderRadius: 20,
+    borderWidth: 1,
+    borderColor: COLORS.darkBlue,
+  },
   container: {
     flexGrow: 1,
     padding: 20,
-    backgroundColor: "#fff",
+    paddingTop: 10,
   },
   title: {
-    fontSize: 24,
+    fontSize: 28,
     fontWeight: "bold",
-    marginBottom: 20,
+    color: COLORS.darkBlue,
+    marginBottom: 25,
     textAlign: "center",
   },
   formGroup: {
@@ -227,41 +288,97 @@ const styles = StyleSheet.create({
     fontSize: 16,
     marginBottom: 8,
     fontWeight: "600",
+    color: COLORS.darkBlue,
   },
   input: {
     borderWidth: 1,
-    borderColor: "#ccc",
-    borderRadius: 4,
-    padding: 12,
+    borderColor: COLORS.lightBlue,
+    borderRadius: 10,
+    padding: 14,
     fontSize: 16,
-    marginBottom: 4,
+    backgroundColor: COLORS.white,
+    color: COLORS.darkBlue,
   },
   pickerContainer: {
     borderWidth: 1,
-    borderColor: "#ccc",
-    borderRadius: 4,
+    borderColor: COLORS.lightBlue,
+    borderRadius: 10,
     overflow: "hidden",
-  },
-  picker: {
-    width: "100%",
+    backgroundColor: COLORS.white,
   },
   hint: {
     fontSize: 12,
-    color: "#666",
+    color: COLORS.darkBlue,
+    marginTop: 5,
+    fontStyle: "italic",
   },
   buttonContainer: {
-    marginTop: 20,
     flexDirection: "row",
     justifyContent: "space-between",
+    marginTop: 25,
+  },
+  button: {
+    flex: 1,
+    padding: 15,
+    borderRadius: 25,
+    alignItems: "center",
+    justifyContent: "center",
+    flexDirection: "row",
+    gap: 10,
+  },
+  submitButton: {
+    backgroundColor: COLORS.darkBlue,
+    marginLeft: 10,
+  },
+  cancelButton: {
+    backgroundColor: COLORS.pink,
+    marginRight: 10,
+  },
+  disabledButton: {
+    backgroundColor: "#CCCCCC",
+  },
+  buttonText: {
+    color: COLORS.white,
+    fontWeight: "bold",
+    fontSize: 16,
   },
   center: {
     flex: 1,
     justifyContent: "center",
     alignItems: "center",
+    padding: 20,
   },
   errorText: {
-    color: "red",
-    marginBottom: 20,
+    color: COLORS.pink,
+    fontSize: 18,
+    marginVertical: 20,
+    textAlign: "center",
+  },
+  backButton: {
+    backgroundColor: COLORS.darkBlue,
+    padding: 15,
+    borderRadius: 25,
+    width: "100%",
+    maxWidth: 200,
+    alignItems: "center",
+    marginTop: 20,
+  },
+  backButtonText: {
+    color: COLORS.white,
+    fontWeight: "bold",
+  },
+  dateButton: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 10,
+    borderWidth: 1,
+    borderColor: COLORS.lightBlue,
+    borderRadius: 10,
+    padding: 14,
+    backgroundColor: COLORS.white,
+  },
+  dateButtonText: {
     fontSize: 16,
+    color: COLORS.darkBlue,
   },
 });

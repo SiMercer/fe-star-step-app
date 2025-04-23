@@ -14,12 +14,14 @@ interface Reward {
 
 interface RewardCardListProps {
   rewards?: Reward[];
-  onRefresh?: () => void; // Add callback for refreshing after deletion
+  onRefresh?: () => void;
+  onEditReward?: (reward: Reward) => void;
 }
 
 export default function RewardCardList({
   rewards = [],
   onRefresh,
+  onEditReward,
 }: RewardCardListProps) {
   const [isLoading, setIsLoading] = useState<string | null>(null); // Track which reward is loading
   const [error, setError] = useState<string | null>(null);
@@ -56,7 +58,7 @@ export default function RewardCardList({
         onRefresh();
       }
     } catch (err) {
-      setError(err.message || "Failed to delete reward");
+      setError("Failed to delete reward");
     } finally {
       setIsLoading(null);
     }
@@ -88,6 +90,7 @@ export default function RewardCardList({
           <RewardCard
             reward={reward}
             handleDelete={handleDelete}
+            handleEdit={onEditReward}
             isDeleting={isLoading === reward.reward_id}
           />
           {isLoading === reward.reward_id && (

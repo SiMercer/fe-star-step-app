@@ -198,6 +198,11 @@ const styles = StyleSheet.create({
     flexDirection: "column",
     borderRadius: 15,
     height: "100%",
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.2,
+    shadowRadius: 5,
+    elevation: 5,
   },
 
   headerContainer: {
@@ -217,7 +222,6 @@ const styles = StyleSheet.create({
   },
   nameAgeContainer: {
     alignItems: "center",
-
     flexDirection: "row",
     gap: 10,
     justifyContent: "center",
@@ -227,11 +231,15 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     backgroundColor: "#FFFEFF",
     height: 100,
-
     flexDirection: "column",
     borderRadius: 15,
     alignContent: "center",
     padding: 10,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.2,
+    shadowRadius: 5,
+    elevation: 5,
   },
 
   kidAgeContainer: {
@@ -244,6 +252,11 @@ const styles = StyleSheet.create({
     flexDirection: "column",
     borderRadius: 15,
     alignContent: "center",
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.2,
+    shadowRadius: 5,
+    elevation: 5,
   },
   inputStyle: {
     width: "98%",
@@ -269,6 +282,11 @@ const styles = StyleSheet.create({
     flexDirection: "column",
     borderRadius: 15,
     alignContent: "center",
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.2,
+    shadowRadius: 5,
+    elevation: 5,
   },
   inputLabel: {
     fontFamily: "Titles",
@@ -302,5 +320,10 @@ const styles = StyleSheet.create({
     borderRadius: 15,
     alignItems: "center",
     justifyContent: "center",
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.2,
+    shadowRadius: 5,
+    elevation: 5,
   },
 });

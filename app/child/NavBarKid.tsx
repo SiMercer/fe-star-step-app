@@ -1,6 +1,5 @@
 import { Link } from "expo-router";
 import { StyleSheet, Text, TouchableOpacity } from "react-native";
-import { Button } from "react-native";
 import { View } from "react-native";
 
 export default function NavBarKid() {
@@ -30,7 +29,7 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     // width: "100%",
     justifyContent: "center",
-    gap: 3,
+    gap: 2,
     position: "absolute",
     bottom: 0,
     left: 0,
@@ -38,7 +37,7 @@ const styles = StyleSheet.create({
   },
   dashboardButton: {
     borderBottomLeftRadius: 15,
-    borderTopLeftRadius: 15,
+    // borderTopLeftRadius: 15,
     width: "40%",
     height: 80,
     display: "flex",
@@ -56,8 +55,8 @@ const styles = StyleSheet.create({
   },
   rewardsButton: {
     borderBottomRightRadius: 15,
-    borderTopRightRadius: 15,
-    width: "30%",
+    // borderTopRightRadius: 15,
+    width: "29.5%",
     height: 80,
     display: "flex",
     justifyContent: "center",

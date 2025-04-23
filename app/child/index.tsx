@@ -196,6 +196,11 @@ const styles = StyleSheet.create({
     flexDirection: "column",
     borderRadius: 15,
     height: "100%",
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 3,
+    elevation: 3,
   },
   headerContainer: {
     width: "98%",
@@ -230,6 +235,11 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     width: "100%",
     marginTop: 30,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.2,
+    shadowRadius: 5,
+    elevation: 5,
   },
 
   rewardTasksContainer: {
@@ -248,6 +258,11 @@ const styles = StyleSheet.create({
     height: 200,
     width: "45%",
     marginTop: 30,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.2,
+    shadowRadius: 5,
+    elevation: 5,
   },
   taskContainer: {
     display: "flex",
@@ -259,5 +274,10 @@ const styles = StyleSheet.create({
     height: 200,
     width: "45%",
     marginTop: 30,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.2,
+    shadowRadius: 5,
+    elevation: 5,
   },
 });

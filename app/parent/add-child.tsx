@@ -17,7 +17,7 @@ import { useChild } from "@/contexts/ChildContext";
 export default function ParentAddChildScreen() {
   const router = useRouter();
   const { parent, isLoading, login } = useAuth();
-  const { setSelectedChild } = useChild();
+  // const { setSelectedChild } = useChild();
   const [img, setImg] = useState<string>("");
   const [name, setName] = useState<string>("");
   const [age, setAge] = useState<string>("");
@@ -37,7 +37,7 @@ export default function ParentAddChildScreen() {
     try {
       const createdKidProfile = await createKidProfile(kidData);
       if (createdKidProfile) {
-        setSelectedChild(createdKidProfile);
+        // setSelectedChild(createdKidProfile);
         router.push("/parent");
       }
     } catch {

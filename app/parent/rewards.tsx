@@ -13,6 +13,7 @@ import RewardCardList from "./reward-cardlist";
 import AddRewardForm from "./add-rewards";
 import { router } from "expo-router";
 import { editReward, getRewardsByParent } from "@/utils/api";
+import { useAuth } from "@/hooks/useAuth";
 
 interface Rewards {
   reward_id: string;
@@ -35,10 +36,11 @@ export default function ParentRewardsScreen({
   const [currentEditReward, setCurrentEditReward] = useState<Rewards | null>(
     null
   );
+  const { parent } = useAuth();
 
   useEffect(() => {
     setIsLoading(true);
-    getRewardsByParent("local-test-id")
+    getRewardsByParent(parent?._id)
       .then(({ rewards }) => {
         console.log(rewards);
         setRewards(rewards);

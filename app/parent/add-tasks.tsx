@@ -14,6 +14,7 @@ import { router } from "expo-router";
 import DateTimePicker from "@react-native-community/datetimepicker";
 import { getKidByParentId, postNewTask } from "@/utils/api";
 import { FontAwesome } from "@expo/vector-icons";
+import { useAuth } from "@/hooks/useAuth";
 
 const COLORS = {
   pink: "#FFA1C6",
@@ -42,11 +43,12 @@ export default function AddTaskScreen({ parentID }: AddTaskScreenProps) {
   const [showDatePicker, setShowDatePicker] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isLoadingChildren, setIsLoadingChildren] = useState(true);
+  const { parent } = useAuth();
 
   useEffect(() => {
     const fetchChildren = async () => {
       try {
-        const childrenData = await getKidByParentId("local-test-id");
+        const childrenData = await getKidByParentId(parent?._id);
         setChildren(childrenData);
         setAssignedTo(childrenData[0]?._id || "");
       } catch (error) {
@@ -87,7 +89,7 @@ export default function AddTaskScreen({ parentID }: AddTaskScreenProps) {
         status: "new",
       };
 
-      await postNewTask("local-test-id", assignedTo, newTask);
+      await postNewTask(parent?._id, assignedTo, newTask);
       Alert.alert("Success", "Task added successfully!", [
         { text: "OK", onPress: () => router.back() },
       ]);

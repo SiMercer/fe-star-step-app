@@ -11,6 +11,7 @@ import { FontAwesome } from "@expo/vector-icons";
 import { router } from "expo-router";
 import { getTasksByParent } from "@/utils/api";
 import ParentTaskCard from "./taskcards";
+import { useAuth } from "@/hooks/useAuth";
 
 interface Tasks {
   _id: string;
@@ -34,11 +35,12 @@ export default function ParentTasksScreen() {
   const [tasks, setTasks] = useState<Tasks[]>([]);
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
+  const { parent } = useAuth();
 
   useEffect(() => {
     const loadTasks = async () => {
       try {
-        const tasks = await getTasksByParent("local-test-id");
+        const tasks = await getTasksByParent(parent?._id);
         setTasks(tasks);
       } catch (error) {
         console.error("Failed to fetch tasks:", error);

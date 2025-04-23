@@ -1,6 +1,7 @@
-import { deleteTask, getTaskById } from "@/utils/api";
+import { deleteTask, getTaskById, getKidById } from "@/utils/api";
 import React, { useEffect, useState } from "react";
 import { View, Text, StyleSheet, TouchableOpacity, Alert } from "react-native";
+import { useAuth } from "@/hooks/useAuth";
 
 interface TasksCardsProps {
   task: {
@@ -16,32 +17,33 @@ interface TasksCardsProps {
 }
 
 export default function ParentTaskCard({ task, onDelete }: TasksCardsProps) {
-  // need API function get task by child id
-  // const [children, setChildren] = useState<Child[]>([]);
-
-  // // useEffect(() => {
-  // //   // Fetching the tasks for the kid (this can be passed as a prop or from state)
-  // //   getTaskById(task.assignedTo) // Replace with the actual kid's ID
-  // //     .then((tasks) => {
-  // //       console.log(task.assignedTo);
-  // //       // Assuming the tasks are now loaded
-  // //       console.log({ tasks }); // Check tasks to verify date fields are there
-  // //     });
-  // // }, []);
-  const [isLoading, setIsLoading] = useState<boolean>(false); // Track loading state
+  const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [kidName, setKidName] = useState<string>("");
+  const { parent } = useAuth();
+
+  useEffect(() => {
+    const fetchKidName = async () => {
+      try {
+        const kid = await getKidById(task.assignedTo);
+        setKidName(kid.name);
+      } catch (err) {
+        console.error("Failed to fetch kid name", err);
+        setKidName("Unknown");
+      }
+    };
+
+    if (task.assignedTo) {
+      fetchKidName();
+    }
+  }, [task.assignedTo]);
 
   const handleDelete = (_id: string) => {
-    // Confirmation delete alert
-
     Alert.alert(
       "Confirm Deletion",
       "Are you sure you want to delete this task?",
       [
-        {
-          text: "Cancel",
-          style: "cancel",
-        },
+        { text: "Cancel", style: "cancel" },
         {
           text: "Delete",
           style: "destructive",
@@ -52,28 +54,21 @@ export default function ParentTaskCard({ task, onDelete }: TasksCardsProps) {
   };
 
   const deleteReward = async (_id: string) => {
-    console.log(_id);
-    setIsLoading(true); // Start loading when deleting
-    setError(null); // Clear any previous errors
+    setIsLoading(true);
+    setError(null);
 
     try {
-      await deleteTask(_id); // Make the API call to delete the task
+      await deleteTask(_id);
       onDelete(_id);
-      console.log("Task deleted successfully.");
     } catch (err) {
-      console.error("Error deleting task:", err);
       setError("Failed to delete task");
     } finally {
-      setIsLoading(false); // Stop loading once the process is done
+      setIsLoading(false);
     }
   };
 
   return (
-    <View
-      style={styles.card}
-      accessible={true}
-      accessibilityLabel={`task: ${task.title}, Cost: ${task.starsRewards} points`}
-    >
+    <View style={styles.card}>
       <Text style={styles.title}>{task.title}</Text>
       <Text style={styles.text}>Cost: {task.starsRewards} points</Text>
       <Text
@@ -85,15 +80,14 @@ export default function ParentTaskCard({ task, onDelete }: TasksCardsProps) {
       >
         Status: {task.status}
       </Text>
-
       <Text style={[styles.text, { color: "#888" }]}>
         valid before: {task.validBefore}
       </Text>
       <Text style={[styles.text, { color: "#888" }]}>
-        assigned to: {task.assignedTo}
+        assigned to: {kidName || "Loading..."}
       </Text>
       <Text style={[styles.text, { color: "#888" }]}>
-        Created by: {task.createdBy}
+        Created by: {parent?.parentName}
       </Text>
 
       {error && <Text style={styles.errorText}>{error}</Text>}
@@ -103,24 +97,22 @@ export default function ParentTaskCard({ task, onDelete }: TasksCardsProps) {
           style={[styles.button, styles.deleteButton]}
           onPress={() => handleDelete(task._id)}
           disabled={isLoading}
-          accessibilityLabel="Delete task"
         >
-          {isLoading ? (
-            <Text style={styles.buttonText}>Deleting...</Text>
-          ) : (
-            <Text style={styles.buttonText}>Delete</Text>
-          )}
+          <Text style={styles.buttonText}>
+            {isLoading ? "Deleting..." : "Delete"}
+          </Text>
         </TouchableOpacity>
       </View>
     </View>
   );
 }
+
 const COLORS = {
-  pink: "#FFA1C6", // Primary accent color
-  lightBlue: "#D1DBFF", // Secondary color
-  darkBlue: "#7697F9", // Primary action color
-  white: "#FFFEFF", // Pure white
-  offWhite: "#EBECFF", // Background/light color
+  pink: "#FFA1C6",
+  lightBlue: "#D1DBFF",
+  darkBlue: "#7697F9",
+  white: "#FFFEFF",
+  offWhite: "#EBECFF",
 };
 
 const styles = StyleSheet.create({

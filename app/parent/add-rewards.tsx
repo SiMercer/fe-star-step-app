@@ -9,6 +9,7 @@ import {
 } from "react-native";
 import ModalSelector from "react-native-modal-selector";
 import { postNewReward, editReward } from "@/utils/api";
+import { useAuth } from "@/hooks/useAuth";
 
 type AddRewardFormProps = {
   parentId: string;
@@ -36,6 +37,7 @@ export default function AddRewardForm({
   const [cost, setCost] = useState(1);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [formError, setFormError] = useState("");
+  const { parent } = useAuth();
 
   // Initialize form with reward data if editing
   useEffect(() => {
@@ -88,7 +90,7 @@ export default function AddRewardForm({
         createdBy: parentId,
       };
 
-      postNewReward("local-test-id", reward)
+      postNewReward(parent?._id, reward)
         .then(() => {
           onRewardAdded?.(title.trim(), cost);
           resetForm();

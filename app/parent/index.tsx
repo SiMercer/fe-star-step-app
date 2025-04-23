@@ -1,18 +1,49 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import {
-  ScrollView,
   View,
   Text,
-  Button,
-  ActivityIndicator,
+  ScrollView,
   TouchableOpacity,
   StyleSheet,
+  ActivityIndicator,
+  Image,
 } from "react-native";
 import { Link } from "expo-router";
 import { useAuth } from "../../hooks/useAuth";
+import ParentTaskCard from "./taskcards"; // Adjust path if needed
+import { getTasksByParent } from "@/utils/api"; // Update path if needed
 
 export default function ParentDashboard() {
   const { parent, isLoading, logout } = useAuth();
+  const [children, setChildren] = useState([]);
+  const [tasks, setTasks] = useState([]);
+
+  useEffect(() => {
+    if (parent?._id) {
+      fetch(`https://be-star-step-app-dev.onrender.com/api/kids/parent/${parent._id}`)
+        .then(res => res.json())
+        .then(data => setChildren(data))
+        .catch(err => console.error("Failed to load children:", err));
+    }
+  }, [parent]);
+
+  useEffect(() => {
+    const fetchTasks = async () => {
+      if (parent?._id) {
+        try {
+          const tasks = await getTasksByParent(parent._id);
+          setTasks(tasks);
+        } catch (err) {
+          console.error("Error loading tasks:", err);
+        }
+      }
+    };
+    fetchTasks();
+  }, [parent]);
+
+  const handleTaskDeleted = (taskId: string) => {
+    setTasks(tasks.filter(task => task._id !== taskId));
+  };
 
   return (
     <ScrollView contentContainerStyle={styles.container}>
@@ -20,80 +51,167 @@ export default function ParentDashboard() {
 
       {isLoading ? (
         <ActivityIndicator size="large" />
-      ) : parent ? (
-        <Text style={styles.subtitle}>
-          Logged in as: {parent.parentName}
-        </Text>
+      ) : !parent ? (
+        <Text style={styles.subtitleError}>You are not logged in</Text>
       ) : (
-        <Text style={[styles.subtitle, { color: "red" }]}>
-          You are not logged in
-        </Text>
+        <>
+          <View style={styles.kidsRow}>
+            {children.map((child) => (
+              <View key={child._id} style={styles.kidBox}>
+                <Image
+                  source={{
+                    uri:
+                      child.avatar ||
+                      "https://img.freepik.com/free-vector/businessman-character-avatar-isolated_24877-60111.jpg",
+                  }}
+                  style={styles.avatar}
+                />
+                <Text style={styles.kidName}>{child.name}</Text>
+                <View style={styles.starBox}>
+                  <Text style={styles.starText}>{child.stars} stars</Text>
+                </View>
+                {child.rewardClaimed && (
+                  <Text style={styles.rewardClaimed}>Reward claimed</Text>
+                )}
+              </View>
+            ))}
+          </View>
+
+          <Link href="/parent/rewards" asChild>
+            <TouchableOpacity style={styles.rewardsButton}>
+              <Text style={styles.rewardsButtonText}>Rewards exchange list</Text>
+            </TouchableOpacity>
+          </Link>
+
+          <Text style={styles.sectionTitle}>Tasks for today</Text>
+
+          <View style={{ width: "100%" }}>
+            {tasks.length > 0 ? (
+              tasks.map((task) => (
+                <ParentTaskCard key={task._id} task={task} onDelete={handleTaskDeleted} />
+              ))
+            ) : (
+              <Text>No tasks available</Text>
+            )}
+          </View>
+
+          <View style={styles.newTaskRow}>
+            <Link href="/parent/tasks" asChild>
+              <TouchableOpacity style={styles.newTaskButton}>
+                <Text style={styles.newTaskButtonText}>Add the new task</Text>
+              </TouchableOpacity>
+            </Link>
+          </View>
+
+          <TouchableOpacity style={styles.logoutButton} onPress={logout}>
+            <Text style={styles.logoutText}>Log Out</Text>
+          </TouchableOpacity>
+        </>
       )}
-
-      <View style={styles.navItem}>
-        <Link href="/" asChild>
-          <Button title="Back Home" />
-        </Link>
-      </View>
-
-      <View style={styles.navItem}>
-        <Link href="/parent/add-child" asChild>
-          <Button title="Add Child" />
-        </Link>
-      </View>
-
-      <View style={styles.navItem}>
-        <Link href="/parent/tasks" asChild>
-          <Button title="Add Task" />
-        </Link>
-      </View>
-
-      <View style={styles.navItem}>
-        <Link href="/parent/rewards" asChild>
-          <Button title="Rewards" />
-        </Link>
-      </View>
-
-      <TouchableOpacity style={styles.logoutButton} onPress={logout}>
-        <Text style={styles.logoutText}>Log Out</Text>
-      </TouchableOpacity>
     </ScrollView>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
-    flexGrow: 1,
-    justifyContent: "center",
-    alignItems: "center",
-    padding: 20,
     backgroundColor: "#EBECFF",
+    flexGrow: 1,
+    alignItems: "center",
+    padding: 24,
   },
   title: {
-    fontSize: 26,
-    marginBottom: 30,
+    fontSize: 28,
     fontWeight: "bold",
     color: "#7697F9",
-  },
-  subtitle: {
-    fontSize: 18,
-    marginBottom: 30,
-  },
-  navItem: {
     marginBottom: 20,
-    width: "100%",
+  },
+  subtitleError: {
+    fontSize: 18,
+    color: "red",
+  },
+  kidsRow: {
+    flexDirection: "row",
+    flexWrap: "wrap",
+    justifyContent: "center",
+    gap: 16,
+    marginBottom: 24,
+  },
+  kidBox: {
+    backgroundColor: "#fff",
+    padding: 12,
+    borderRadius: 20,
+    alignItems: "center",
+    width: 140,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 3,
+    elevation: 3,
+  },
+  avatar: {
+    width: 60,
+    height: 60,
+    borderRadius: 30,
+    marginBottom: 8,
+  },
+  kidName: {
+    fontSize: 16,
+    fontWeight: "bold",
+    marginBottom: 4,
+  },
+  starBox: {
+    backgroundColor: "#FFE178",
+    paddingVertical: 6,
+    paddingHorizontal: 12,
+    borderRadius: 8,
+    marginBottom: 4,
+  },
+  starText: {
+    fontWeight: "600",
+  },
+  rewardClaimed: {
+    fontSize: 12,
+    color: "#555",
+    marginTop: 4,
+  },
+  rewardsButton: {
+    backgroundColor: "#A7F3D0",
+    paddingVertical: 10,
+    paddingHorizontal: 20,
+    borderRadius: 12,
+    marginBottom: 20,
+  },
+  rewardsButtonText: {
+    color: "#065F46",
+    fontWeight: "600",
+  },
+  sectionTitle: {
+    fontSize: 20,
+    fontWeight: "bold",
+    marginBottom: 12,
+  },
+  newTaskRow: {
+    marginTop: 20,
+  },
+  newTaskButton: {
+    backgroundColor: "#FDBA74",
+    paddingVertical: 10,
+    paddingHorizontal: 20,
+    borderRadius: 16,
+  },
+  newTaskButtonText: {
+    color: "#7C2D12",
+    fontWeight: "bold",
   },
   logoutButton: {
     backgroundColor: "#FFA1C6",
-    paddingVertical: 12,
-    paddingHorizontal: 24,
+    paddingVertical: 10,
+    paddingHorizontal: 20,
     borderRadius: 20,
-    marginTop: 30,
+    marginTop: 24,
   },
   logoutText: {
     color: "#000",
-    fontSize: 16,
     fontWeight: "600",
-    textAlign: "center",
   },
 });

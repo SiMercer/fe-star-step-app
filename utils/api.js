@@ -39,11 +39,11 @@ export const getKidsByParent = (parent_id) => {
     return data;
   });
 };
-export const createKidProfile = (parent_id, kidData) => {
-  kidData.parentID = [parent_id]; ///string
-
+export const createKidProfile = (kidData) => {
   return apiRequest
-    .post(`kids/`, kidData)
+    .post(`kids`, kidData, {
+      headers: { "Content-Type": "application/json" },
+    })
     .then(({ data }) => {
       return data;
     })

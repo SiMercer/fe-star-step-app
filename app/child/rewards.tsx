@@ -4,6 +4,7 @@ import {
   Button,
   ActivityIndicator,
   ScrollView,
+  StyleSheet,
 } from "react-native";
 import { Link } from "expo-router";
 import { useEffect, useState } from "react";
@@ -11,6 +12,8 @@ import ChildsRewardsItem from "./rewardsItem";
 import { getKidById, getRewardsByParent } from "../../utils/api";
 import { useChild } from "@/contexts/ChildContext";
 import { useAuth } from "@/hooks/useAuth";
+import NavBarKid from "./NavBarKid";
+import { StyledText } from "@/contexts/fonts";
 
 interface Rewards {
   reward_id: string;
@@ -44,20 +47,31 @@ export default function ChildRewardsScreen() {
   if (!selectedChild) {
     return (
       <View style={{ flex: 1, padding: 20 }}>
-        <Text style={{ fontSize: 24, marginTop: 20 }}>Rewards</Text>
-        <Text style={{ fontSize: 18, marginTop: 10, color: "red" }}>
+        <StyledText style={{ fontSize: 24, marginTop: 20 }}>Rewards</StyledText>
+        <StyledText style={{ fontSize: 18, marginTop: 10, color: "red" }}>
           No child selected.
-        </Text>
+        </StyledText>
       </View>
     );
   }
   return (
-    <View style={{ flex: 1, justifyContent: "space-between", padding: 20 }}>
-      <Text style={{ fontSize: 24, marginTop: 20 }}>Rewards</Text>
-      <Text>Total Stars: {totalStars}⭐</Text>
+    <View
+      style={{
+        flex: 1,
+        justifyContent: "space-between",
+        padding: 30,
+        backgroundColor: "#EBECFF",
+      }}
+    >
+      <View style={styles.header}>
+        <StyledText style={{ fontSize: 24 }}>
+          {selectedChild.name}'s Rewards
+        </StyledText>
+      </View>
+      <StyledText>Total Stars: {totalStars}⭐</StyledText>
       {!isLoading ? (
         listRewards.length === 0 ? (
-          <Text>There are no rewards</Text>
+          <StyledText>There are no rewards</StyledText>
         ) : (
           <ScrollView contentContainerStyle={{ padding: 10 }}>
             {listRewards.map((reward: Rewards) => {
@@ -77,22 +91,19 @@ export default function ChildRewardsScreen() {
       )}
       <View
         style={{
-          padding: 10,
-          flexDirection: "row",
-          justifyContent: "space-around",
-          marginBottom: 20,
+          marginTop: 100,
         }}
       >
-        <Link href="/child" asChild>
-          <Button title="Dashboard" onPress={() => {}} />
-        </Link>
-        <Link href="/child/tasks" asChild>
-          <Button title="Tasks" onPress={() => {}} />
-        </Link>
-        <Link href="/child/rewards" asChild>
-          <Button title="Rewards" onPress={() => {}} />
-        </Link>
+        <NavBarKid />
       </View>
     </View>
   );
 }
+
+const styles = StyleSheet.create({
+  header: {
+    marginTop: 20,
+    flexDirection: "row",
+    justifyContent: "space-evenly",
+  },
+});

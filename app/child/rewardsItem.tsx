@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { Pressable, StyleSheet, Text, View } from "react-native";
 import { editKidProfile, editReward, getKidById } from "../../utils/api";
 import { useChild } from "@/contexts/ChildContext";
+import { StyledText } from "@/contexts/fonts";
 
 interface ItemBoxProps {
   reward: {
@@ -79,13 +80,15 @@ export default function ChildsRewardsItem({
             : styles.greyed
         }
       >
-        <Text style={{ width: "40%" }}>{reward.title}</Text>
-        <Text style={{ alignSelf: "center" }}>{reward.cost + "⭐"}</Text>
+        <StyledText style={{ width: "40%" }}>{reward.title}</StyledText>
+        <StyledText style={{ alignSelf: "center" }}>
+          {reward.cost + "⭐"}
+        </StyledText>
         <View style={{ width: "40%", alignItems: "flex-end" }}>
           {reward.isRedeemed ? (
-            <Text>🎉 Redeemed!!!</Text>
+            <StyledText>🎉 Redeemed!!!</StyledText>
           ) : reward.redeemedBy !== selectedChild._id && reward.redeemedBy ? (
-            <Text>🔒 Requested by {requestedBy}</Text>
+            <StyledText>🔒 Requested by {requestedBy}</StyledText>
           ) : (
             <>
               <Pressable
@@ -97,13 +100,15 @@ export default function ChildsRewardsItem({
                 ></View>
               </Pressable>
               <View>
-                <Text>{isRequested ? "⌛ Waiting" : "🖐️ Request"}</Text>
+                <StyledText>
+                  {isRequested ? "⌛ Waiting" : "🖐️ Request"}
+                </StyledText>
               </View>
             </>
           )}
         </View>
       </View>
-      <Text>{requestError}</Text>
+      <StyledText>{requestError}</StyledText>
     </View>
   );
 }
@@ -116,8 +121,12 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
-    borderRadius: 8,
+    borderRadius: 15,
     backgroundColor: "#D1DBFF",
+    shadowColor: "#000",
+    shadowOpacity: 0.25,
+    shadowRadius: 4,
+    elevation: 5,
   },
   redeemed: {
     height: 70,
@@ -128,7 +137,11 @@ const styles = StyleSheet.create({
     justifyContent: "space-between",
     alignItems: "center",
     backgroundColor: "#77DD77",
-    borderRadius: 8,
+    borderRadius: 15,
+    shadowColor: "#000",
+    shadowOpacity: 0.25,
+    shadowRadius: 4,
+    elevation: 5,
   },
   greyed: {
     height: 70,
@@ -138,8 +151,12 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
-    borderRadius: 8,
+    borderRadius: 15,
     backgroundColor: "#ddd",
+    shadowColor: "#000",
+    shadowOpacity: 0.25,
+    shadowRadius: 4,
+    elevation: 5,
   },
   slider: {
     height: 12,

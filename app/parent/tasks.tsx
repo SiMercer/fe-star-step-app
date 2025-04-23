@@ -3,10 +3,11 @@ import {
   View,
   Text,
   StyleSheet,
-  Button,
   ScrollView,
   ActivityIndicator,
+  TouchableOpacity,
 } from "react-native";
+import { FontAwesome } from "@expo/vector-icons";
 import { router } from "expo-router";
 import { getTasksByParent } from "@/utils/api";
 import ParentTaskCard from "./taskcards";
@@ -15,11 +16,19 @@ interface Tasks {
   _id: string;
   title: string;
   starsRewards: number;
-  validBefore: Date;
+  validBefore: string;
   assignedTo: string;
   createdBy: string;
   status: string;
 }
+
+const COLORS = {
+  pink: "#FFA1C6",
+  lightBlue: "#D1DBFF",
+  darkBlue: "#7697F9",
+  white: "#FFFEFF",
+  offWhite: "#EBECFF",
+};
 
 export default function ParentTasksScreen() {
   const [tasks, setTasks] = useState<Tasks[]>([]);
@@ -27,31 +36,28 @@ export default function ParentTasksScreen() {
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    setIsLoading(true);
-    getTasksByParent("local-test-id")
-      .then((tasks) => {
+    const loadTasks = async () => {
+      try {
+        const tasks = await getTasksByParent("local-test-id");
         setTasks(tasks);
-        setIsLoading(false);
-      })
-      .catch((error) => {
+      } catch (error) {
         console.error("Failed to fetch tasks:", error);
         setError("Failed to load tasks");
-        setTasks([]);
-      })
-      .finally(() => {
+      } finally {
         setIsLoading(false);
-      });
+      }
+    };
+    loadTasks();
   }, []);
 
   const handleTaskDeleted = (taskId: string) => {
-    // After deleting a task, refresh the task list
     setTasks(tasks.filter((task) => task._id !== taskId));
   };
 
   if (isLoading) {
     return (
       <View style={styles.center}>
-        <ActivityIndicator size="large" color="#007bff" />
+        <ActivityIndicator size="large" color={COLORS.darkBlue} />
       </View>
     );
   }
@@ -60,112 +66,129 @@ export default function ParentTasksScreen() {
     return (
       <View style={styles.center}>
         <Text style={styles.errorText}>{error}</Text>
-      </View>
-    );
-  }
-
-  if (tasks.length === 0) {
-    return (
-      <View style={styles.center}>
-        <Text style={styles.heading}>No Tasks Found</Text>
+        <TouchableOpacity onPress={() => setError(null)}>
+          <Text style={styles.retryText}>Try Again</Text>
+        </TouchableOpacity>
       </View>
     );
   }
 
   return (
-    <ScrollView contentContainerStyle={styles.scrollContainer}>
-      <Text style={styles.heading}>Tasks</Text>
+    <View style={styles.screenContainer}>
+      {/* Dashboard Icon */}
+      <TouchableOpacity
+        onPress={() => router.push("/parent")}
+        style={styles.dashboardIcon}
+      >
+        <FontAwesome name="home" size={24} color={COLORS.darkBlue} />
+      </TouchableOpacity>
 
-      <View style={styles.tasksContainer}>
-        {tasks.map((task) => {
-          const uniqueKey = task._id || `${task.title}-${Math.random()}`;
-          return (
-            <ParentTaskCard
-              onDelete={handleTaskDeleted}
-              key={uniqueKey}
-              task={task}
-            />
-          );
-        })}
-      </View>
+      <ScrollView contentContainerStyle={styles.scrollContainer}>
+        <Text style={styles.heading}>Tasks</Text>
 
-      <View style={styles.buttonGroup}>
-        <View style={styles.buttonContainer}>
-          <Button
-            title="Back to Dashboard"
-            onPress={() => router.push("/parent")}
-
-
-          />
+        <View style={styles.tasksContainer}>
+          {tasks.length > 0 ? (
+            tasks.map((task) => (
+              <ParentTaskCard
+                key={task._id}
+                task={task}
+                onDelete={handleTaskDeleted}
+              />
+            ))
+          ) : (
+            <View style={styles.emptyState}>
+              <FontAwesome name="tasks" size={48} color={COLORS.lightBlue} />
+              <Text style={styles.emptyText}>No tasks yet!</Text>
+              <TouchableOpacity
+                style={styles.addButton}
+                onPress={() => router.push("/parent/add-tasks")}
+              >
+                <Text style={styles.addButtonText}>Create First Task</Text>
+              </TouchableOpacity>
+            </View>
+          )}
         </View>
 
-
-
-
-        
-        <View style={styles.buttonContainer}>
-          <Button
-            title={tasks.length === 0 ? "Create First Task" : "Add New Task"}
+        {tasks.length > 0 && (
+          <TouchableOpacity
+            style={styles.addButton}
             onPress={() => router.push("/parent/add-tasks")}
-            color="#007bff"
-            style={styles.button}
-          />
-        </View>
-      </View>
-    </ScrollView>
+          >
+            <Text style={styles.addButtonText}>Add New Task</Text>
+          </TouchableOpacity>
+        )}
+      </ScrollView>
+    </View>
   );
 }
 
 const styles = StyleSheet.create({
+  screenContainer: {
+    flex: 1,
+    backgroundColor: COLORS.offWhite,
+    paddingTop: 50,
+  },
+  dashboardIcon: {
+    position: "absolute",
+    top: 15,
+    left: 15,
+    zIndex: 10,
+    padding: 10,
+    backgroundColor: COLORS.white,
+    borderRadius: 20,
+    borderWidth: 1,
+    borderColor: COLORS.darkBlue,
+  },
+  scrollContainer: {
+    flexGrow: 1,
+    padding: 20,
+    paddingTop: 10,
+  },
   heading: {
     fontSize: 28,
     fontWeight: "bold",
+    color: COLORS.darkBlue,
+    marginBottom: 20,
     textAlign: "center",
-    marginVertical: 20,
-    color: "#333",
   },
   tasksContainer: {
-    marginBottom: 30,
-    width: "100%",
-  },
-  buttonGroup: {
-    marginTop: 20,
-    flexDirection: "row",
-    justifyContent: "space-between",
-    width: "100%",
-    gap: 15,
-  },
-  buttonContainer: {
-    flex: 1,
-    marginHorizontal: 5,
-  },
-  scrollContainer: {
-    flexGrow: 1, // Ensure ScrollView content fills the available space
-    justifyContent: "flex-start", // Prevent content from being pushed down
-    paddingHorizontal: 24,
-    paddingBottom: 20,
-  },
-  container: {
-    flex: 1,
-    justifyContent: "center",
-    alignItems: "center",
-    backgroundColor: "#f9f9f9",
-  },
-  errorText: {
-    color: "red",
-    marginBottom: 16,
-    textAlign: "center",
-    fontSize: 16,
+    marginBottom: 20,
   },
   center: {
     flex: 1,
     justifyContent: "center",
     alignItems: "center",
+    backgroundColor: COLORS.offWhite,
   },
-  subtext: {
-    textAlign: "center",
+  errorText: {
+    color: COLORS.pink,
     fontSize: 16,
-    color: "#666",
+    marginBottom: 10,
+  },
+  retryText: {
+    color: COLORS.darkBlue,
+    textDecorationLine: "underline",
+  },
+  emptyState: {
+    alignItems: "center",
+    justifyContent: "center",
+    padding: 40,
+  },
+  emptyText: {
+    fontSize: 18,
+    color: COLORS.darkBlue,
+    marginVertical: 15,
+  },
+  addButton: {
+    backgroundColor: COLORS.darkBlue,
+    padding: 15,
+    borderRadius: 25,
+    alignItems: "center",
     marginTop: 20,
+  },
+  addButtonText: {
+    color: COLORS.white,
+    fontWeight: "bold",
+    fontSize: 16,
   },
 });

@@ -7,7 +7,7 @@ interface TasksCardsProps {
     _id: string;
     title: string;
     starsRewards: number;
-    validBefore: Date;
+    validBefore: string;
     assignedTo: string;
     createdBy: string;
     status: string;
@@ -115,26 +115,15 @@ export default function ParentTaskCard({ task, onDelete }: TasksCardsProps) {
     </View>
   );
 }
+const COLORS = {
+  pink: "#FFA1C6", // Primary accent color
+  lightBlue: "#D1DBFF", // Secondary color
+  darkBlue: "#7697F9", // Primary action color
+  white: "#FFFEFF", // Pure white
+  offWhite: "#EBECFF", // Background/light color
+};
 
 const styles = StyleSheet.create({
-  card: {
-    padding: 16,
-    marginBottom: 12,
-    backgroundColor: "#ffffff",
-    borderRadius: 8,
-    borderWidth: 1,
-    borderColor: "#e0e0e0",
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.1,
-    shadowRadius: 2,
-    elevation: 2,
-  },
-  title: {
-    fontSize: 18,
-    fontWeight: "bold",
-    marginBottom: 8,
-  },
   text: {
     fontSize: 16,
     marginBottom: 4,
@@ -157,9 +146,6 @@ const styles = StyleSheet.create({
     minWidth: 80,
     alignItems: "center",
   },
-  deleteButton: {
-    backgroundColor: "#f44336",
-  },
   buttonText: {
     color: "white",
     fontWeight: "bold",
@@ -169,5 +155,72 @@ const styles = StyleSheet.create({
     fontSize: 14,
     marginTop: 8,
     textAlign: "center",
+  },
+  card: {
+    backgroundColor: COLORS.white,
+    borderRadius: 12,
+    padding: 16,
+    marginBottom: 15,
+    borderWidth: 1,
+    borderColor: COLORS.lightBlue,
+    shadowColor: COLORS.darkBlue,
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 3,
+  },
+  cardHeader: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    marginBottom: 12,
+  },
+  title: {
+    fontSize: 18,
+    fontWeight: "bold",
+    color: COLORS.darkBlue,
+    flex: 1,
+  },
+  statusBadge: {
+    paddingHorizontal: 10,
+    paddingVertical: 4,
+    borderRadius: 12,
+    alignSelf: "flex-start",
+  },
+  statusText: {
+    color: COLORS.white,
+    fontSize: 12,
+    fontWeight: "bold",
+    textTransform: "capitalize",
+  },
+  detailsRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    marginBottom: 8,
+  },
+  detailText: {
+    marginLeft: 8,
+    color: COLORS.darkBlue,
+  },
+  actions: {
+    flexDirection: "row",
+    justifyContent: "flex-end",
+    marginTop: 12,
+    gap: 10,
+  },
+  editButton: {
+    backgroundColor: COLORS.darkBlue,
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  deleteButton: {
+    backgroundColor: COLORS.pink,
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    justifyContent: "center",
+    alignItems: "center",
   },
 });

@@ -1,4 +1,10 @@
-import { View, Text, Button, ActivityIndicator } from "react-native";
+import {
+  View,
+  Text,
+  Button,
+  ActivityIndicator,
+  ScrollView,
+} from "react-native";
 import { Link } from "expo-router";
 import { useEffect, useState } from "react";
 import ChildsRewardsItem from "./rewardsItem";
@@ -53,7 +59,7 @@ export default function ChildRewardsScreen() {
         listRewards.length === 0 ? (
           <Text>There are no rewards</Text>
         ) : (
-          <View style={{ height: "80%", justifyContent: "flex-start" }}>
+          <ScrollView contentContainerStyle={{ padding: 10 }}>
             {listRewards.map((reward: Rewards) => {
               return (
                 <ChildsRewardsItem
@@ -64,13 +70,14 @@ export default function ChildRewardsScreen() {
                 />
               );
             })}
-          </View>
+          </ScrollView>
         )
       ) : (
         <ActivityIndicator />
       )}
       <View
         style={{
+          padding: 10,
           flexDirection: "row",
           justifyContent: "space-around",
           marginBottom: 20,

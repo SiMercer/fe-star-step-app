@@ -3,12 +3,11 @@ import {
   ScrollView,
   View,
   Text,
-  TouchableOpacity,
   StyleSheet,
   Image,
   Alert,
+  Pressable,
 } from "react-native";
-
 import { Link, useRouter } from "expo-router";
 import { useAuth } from "../hooks/useAuth";
 import { useChild } from "../contexts/ChildContext";
@@ -53,6 +52,9 @@ export default function HomeScreen() {
     );
   };
 
+  const fallbackUri =
+    "https://img.freepik.com/free-vector/businessman-character-avatar-isolated_24877-60111.jpg";
+
   return (
     <ScrollView contentContainerStyle={styles.container}>
       <Image
@@ -76,21 +78,21 @@ export default function HomeScreen() {
                   if (!child || !child._id || !child.name) return null;
 
                   return (
-                    <TouchableOpacity
+                    <Pressable
                       key={child._id}
-                      style={styles.childBox}
                       onPress={() => handleSelectChild(child)}
+                      style={({ hovered, pressed }) => [
+                        styles.childBox,
+                        hovered && styles.childBoxHover,
+                        pressed && styles.childBoxPressed,
+                      ]}
                     >
                       <Image
-                        source={{
-                          uri:
-                            child.avatar ||
-                            "https://img.freepik.com/free-vector/businessman-character-avatar-isolated_24877-60111.jpg",
-                        }}
+                        source={{ uri: child.avatar || fallbackUri }}
                         style={styles.avatarLarge}
                       />
                       <Text style={styles.childName}>{child.name}</Text>
-                    </TouchableOpacity>
+                    </Pressable>
                   );
                 })}
               </View>
@@ -99,21 +101,21 @@ export default function HomeScreen() {
         </>
       ) : (
         <>
-          <TouchableOpacity style={styles.loginButton} onPress={login}>
+          <Pressable style={styles.loginButton} onPress={login}>
             <Text style={styles.buttonText}>Log In</Text>
-          </TouchableOpacity>
+          </Pressable>
         </>
       )}
 
       <Link href="/parent/pin" asChild>
-        <TouchableOpacity style={styles.navButton}>
+        <Pressable style={styles.navButton}>
           <Text style={styles.buttonText}>Parent Dashboard</Text>
-        </TouchableOpacity>
+        </Pressable>
       </Link>
 
       <View style={styles.bottomNav}>
         <View style={styles.rowButtons}>
-          <TouchableOpacity
+          <Pressable
             style={styles.smallNavButton}
             onPress={login}
             disabled={isLoading}
@@ -121,14 +123,11 @@ export default function HomeScreen() {
             <Text style={styles.buttonText}>
               {isLoading ? "Loading…" : "Parent Login"}
             </Text>
-          </TouchableOpacity>
+          </Pressable>
 
-          <TouchableOpacity
-            style={styles.smallNavButton}
-            onPress={alertConfirmLogout}
-          >
+          <Pressable style={styles.smallNavButton} onPress={alertConfirmLogout}>
             <Text style={styles.buttonText}>Log Out</Text>
-          </TouchableOpacity>
+          </Pressable>
         </View>
       </View>
     </ScrollView>
@@ -180,6 +179,15 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.15,
     shadowRadius: 4,
     elevation: 4,
+    transitionDuration: "200ms", // Web only
+  },
+  childBoxHover: {
+    backgroundColor: "#c8d5ff",
+    transform: [{ scale: 1.03 }],
+  },
+  childBoxPressed: {
+    backgroundColor: "#b6c8ff",
+    transform: [{ scale: 0.97 }],
   },
   avatarLarge: {
     width: 80,

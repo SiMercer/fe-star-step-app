@@ -94,10 +94,15 @@ export default function ParentTasksScreen() {
           <Button
             title="Back to Dashboard"
             onPress={() => router.push("/parent")}
-            color="#ffffff"
-            style={styles.button}
+
+
           />
         </View>
+
+
+
+
+        
         <View style={styles.buttonContainer}>
           <Button
             title={tasks.length === 0 ? "Create First Task" : "Add New Task"}

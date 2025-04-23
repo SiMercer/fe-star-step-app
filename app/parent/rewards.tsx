@@ -58,8 +58,8 @@ export default function ParentRewardsScreen() {
       />
 
       <Text style={[styles.heading, { marginTop: 24 }]}>Create a Reward</Text>
-
-      <AddRewardForm onRewardAdded={handleAddReward} />
+{/* 
+      <AddRewardForm onRewardAdded={handleAddReward} /> */}
 
       <Button
         title="Back to Dashboard"

@@ -1,8 +1,17 @@
 import React, { useEffect, useState } from "react";
-import { ScrollView, View, Text, Button, StyleSheet } from "react-native";
+import {
+  ScrollView,
+  View,
+  Text,
+  TouchableOpacity,
+  StyleSheet,
+  Image,
+} from "react-native";
+
 import { Link, useRouter } from "expo-router";
 import { useAuth } from "../hooks/useAuth";
 import { useChild } from "../contexts/ChildContext";
+import { StyledText } from "../contexts/fonts";
 
 export default function HomeScreen() {
   const { parent, isLoading, login, logout } = useAuth();
@@ -17,8 +26,10 @@ export default function HomeScreen() {
       )
         .then((res) => res.json())
         .then((data) => {
-          console.log("Fetched children:", data);
-          setChildren(data);
+          const filtered = data.filter(
+            (child) => child && child._id && typeof child.name === "string"
+          );
+          setChildren(filtered);
         })
         .catch((err) => console.error("Error fetching children:", err));
     }
@@ -31,42 +42,67 @@ export default function HomeScreen() {
 
   return (
     <ScrollView contentContainerStyle={styles.container}>
-      <Text style={styles.title}>StarSteps</Text>
+      <Image
+        source={require("../assets/images/logo.png")}
+        style={styles.logo}
+        resizeMode="contain"
+      />
+      <StyledText style={{ fontSize: 40, color: "#7697F9", marginTop: 10 }}>
+        StarSteps
+      </StyledText>
 
       {isLoading ? (
-        <Text>Loading…</Text>
+        <Text style={styles.subtitle}>Loading…</Text>
       ) : parent ? (
         <>
-          <Text style={styles.subtitle}>Logged in as {parent.parentName}</Text>
-          <Button title="Log Out" onPress={logout} />
-
           {children.length > 0 && (
             <>
-              <Text style={styles.subtitle}>Select a Child:</Text>
-              {children.map((child) => (
-                <View key={child._id} style={styles.navItem}>
-                  <Button
-                    title={child.name}
-                    onPress={() => handleSelectChild(child)}
-                  />
-                </View>
-              ))}
+              <Text style={styles.subtitle}>Child Select:</Text>
+              <View style={styles.childGrid}>
+                {children.map((child) => {
+                  if (!child || !child._id || !child.name) return null;
+
+                  return (
+                    <TouchableOpacity
+                      key={child._id}
+                      style={styles.childBox}
+                      onPress={() => handleSelectChild(child)}
+                    >
+                      <Image
+                        source={{
+                          uri:
+                            child.avatar ||
+                            "https://img.freepik.com/free-vector/businessman-character-avatar-isolated_24877-60111.jpg",
+                        }}
+                        style={styles.avatarLarge}
+                      />
+                      <Text style={styles.childName}>{child.name}</Text>
+                    </TouchableOpacity>
+                  );
+                })}
+              </View>
             </>
           )}
         </>
       ) : (
-        <Button title="Log In" onPress={login} />
+        <>
+          <TouchableOpacity style={styles.loginButton} onPress={login}>
+            <Text style={styles.buttonText}>Log In</Text>
+          </TouchableOpacity>
+        </>
       )}
 
-      <View style={styles.navItem}>
+      <View style={styles.bottomNav}>
         <Link href="/parent/login" asChild>
-          <Button title="Parent Login" />
+          <TouchableOpacity style={styles.navButton}>
+            <Text style={styles.buttonText}>Parent Login</Text>
+          </TouchableOpacity>
         </Link>
-      </View>
 
-      <View style={styles.navItem}>
         <Link href="/parent" asChild>
-          <Button title="Parent Dashboard" />
+          <TouchableOpacity style={styles.navButton}>
+            <Text style={styles.buttonText}>Parent Dashboard</Text>
+          </TouchableOpacity>
         </Link>
       </View>
     </ScrollView>
@@ -76,11 +112,78 @@ export default function HomeScreen() {
 const styles = StyleSheet.create({
   container: {
     flexGrow: 1,
-    justifyContent: "center",
+    backgroundColor: "#EBECFF",
     alignItems: "center",
-    padding: 20,
+    padding: 30,
   },
-  title: { fontSize: 28, marginBottom: 20 },
-  subtitle: { fontSize: 20, marginTop: 20, marginBottom: 10 },
-  navItem: { width: "100%", marginVertical: 8 },
+  logo: {
+    width: 100,
+    height: 100,
+    marginBottom: 10,
+  },
+  subtitle: {
+    fontSize: 18,
+    color: "#333",
+    marginVertical: 10,
+    textAlign: "center",
+  },
+  loginButton: {
+    backgroundColor: "#7697F9",
+    paddingVertical: 12,
+    paddingHorizontal: 24,
+    borderRadius: 20,
+    marginVertical: 10,
+  },
+  childGrid: {
+    flexDirection: "row",
+    flexWrap: "wrap",
+    justifyContent: "center",
+    marginTop: 16,
+  },
+  childBox: {
+    backgroundColor: "#D1DBFF",
+    borderRadius: 24,
+    padding: 16,
+    width: 140,
+    height: 160,
+    alignItems: "center",
+    justifyContent: "center",
+    margin: 10,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.15,
+    shadowRadius: 4,
+    elevation: 4,
+  },
+  avatarLarge: {
+    width: 80,
+    height: 80,
+    borderRadius: 40,
+    marginBottom: 10,
+  },
+  childName: {
+    fontSize: 16,
+    fontWeight: "600",
+    color: "#333",
+    textAlign: "center",
+  },
+  navButton: {
+    backgroundColor: "#FFFEEF",
+    paddingVertical: 12,
+    paddingHorizontal: 30,
+    borderRadius: 20,
+    marginVertical: 5,
+    width: "80%",
+    alignItems: "center",
+  },
+  buttonText: {
+    color: "#000",
+    fontSize: 16,
+    fontWeight: "600",
+  },
+  bottomNav: {
+    marginTop: 30,
+    width: "100%",
+    alignItems: "center",
+  },
 });

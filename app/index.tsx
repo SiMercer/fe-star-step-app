@@ -6,6 +6,7 @@ import {
   TouchableOpacity,
   StyleSheet,
   Image,
+  Alert,
 } from "react-native";
 
 import { Link, useRouter } from "expo-router";
@@ -38,6 +39,18 @@ export default function HomeScreen() {
   const handleSelectChild = (child) => {
     setSelectedChild(child);
     router.push("/child");
+  };
+
+  const alertConfirmLogout = () => {
+    Alert.alert(
+      "Log Out",
+      "Are you sure you want to log out?",
+      [
+        { text: "Cancel", style: "cancel" },
+        { text: "Log Out", onPress: logout },
+      ],
+      { cancelable: true }
+    );
   };
 
   return (
@@ -92,18 +105,31 @@ export default function HomeScreen() {
         </>
       )}
 
-      <View style={styles.bottomNav}>
-        <Link href="/parent/login" asChild>
-          <TouchableOpacity style={styles.navButton}>
-            <Text style={styles.buttonText}>Parent Login</Text>
-          </TouchableOpacity>
-        </Link>
+      <Link href="/parent/pin" asChild>
+        <TouchableOpacity style={styles.navButton}>
+          <Text style={styles.buttonText}>Parent Dashboard</Text>
+        </TouchableOpacity>
+      </Link>
 
-        <Link href="/parent" asChild>
-          <TouchableOpacity style={styles.navButton}>
-            <Text style={styles.buttonText}>Parent Dashboard</Text>
+      <View style={styles.bottomNav}>
+        <View style={styles.rowButtons}>
+          <TouchableOpacity
+            style={styles.smallNavButton}
+            onPress={login}
+            disabled={isLoading}
+          >
+            <Text style={styles.buttonText}>
+              {isLoading ? "Loading…" : "Parent Login"}
+            </Text>
           </TouchableOpacity>
-        </Link>
+
+          <TouchableOpacity
+            style={styles.smallNavButton}
+            onPress={alertConfirmLogout}
+          >
+            <Text style={styles.buttonText}>Log Out</Text>
+          </TouchableOpacity>
+        </View>
       </View>
     </ScrollView>
   );
@@ -167,6 +193,24 @@ const styles = StyleSheet.create({
     color: "#333",
     textAlign: "center",
   },
+  bottomNav: {
+    marginTop: 30,
+    width: "100%",
+    alignItems: "center",
+  },
+  rowButtons: {
+    flexDirection: "row",
+    justifyContent: "center",
+    marginBottom: 12,
+  },
+  smallNavButton: {
+    backgroundColor: "#FFFEEF",
+    paddingVertical: 10,
+    paddingHorizontal: 20,
+    borderRadius: 16,
+    marginHorizontal: 6,
+    alignItems: "center",
+  },
   navButton: {
     backgroundColor: "#FFFEEF",
     paddingVertical: 12,
@@ -180,10 +224,5 @@ const styles = StyleSheet.create({
     color: "#000",
     fontSize: 16,
     fontWeight: "600",
-  },
-  bottomNav: {
-    marginTop: 30,
-    width: "100%",
-    alignItems: "center",
   },
 });

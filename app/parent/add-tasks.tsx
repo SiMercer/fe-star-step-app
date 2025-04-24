@@ -14,6 +14,7 @@ import { router } from "expo-router";
 import DateTimePicker from "@react-native-community/datetimepicker";
 import { getKidByParentId, postNewTask } from "@/utils/api";
 import { FontAwesome } from "@expo/vector-icons";
+import { useAuth } from "@/hooks/useAuth";
 
 const COLORS = {
   pink: "#FFA1C6",
@@ -28,11 +29,7 @@ interface Child {
   name: string;
 }
 
-interface AddTaskScreenProps {
-  parentID: "local-test-id";
-}
-
-export default function AddTaskScreen({ parentID }: AddTaskScreenProps) {
+export default function AddTaskScreen() {
   // Form state
   const [title, setTitle] = useState("");
   const [starsReward, setStarsRewards] = useState("");
@@ -42,11 +39,12 @@ export default function AddTaskScreen({ parentID }: AddTaskScreenProps) {
   const [showDatePicker, setShowDatePicker] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isLoadingChildren, setIsLoadingChildren] = useState(true);
+  const { parent } = useAuth();
 
   useEffect(() => {
     const fetchChildren = async () => {
       try {
-        const childrenData = await getKidByParentId("local-test-id");
+        const childrenData = await getKidByParentId(parent?._id);
         setChildren(childrenData);
         setAssignedTo(childrenData[0]?._id || "");
       } catch (error) {
@@ -58,7 +56,7 @@ export default function AddTaskScreen({ parentID }: AddTaskScreenProps) {
     };
 
     fetchChildren();
-  }, [parentID]);
+  }, []);
 
   const onChangeDate = (event: any, selectedDate?: Date) => {
     const currentDate = selectedDate || validBefore;
@@ -87,7 +85,7 @@ export default function AddTaskScreen({ parentID }: AddTaskScreenProps) {
         status: "new",
       };
 
-      await postNewTask("local-test-id", assignedTo, newTask);
+      await postNewTask(parent?._id, assignedTo, newTask);
       Alert.alert("Success", "Task added successfully!", [
         { text: "OK", onPress: () => router.back() },
       ]);
@@ -143,22 +141,19 @@ export default function AddTaskScreen({ parentID }: AddTaskScreenProps) {
           />
         </View>
 
-        <View style={styles.formGroup}>
-          <Text style={styles.label}>Assign To*</Text>
-          <View style={styles.pickerContainer}>
-            <RNPickerSelect
-              onValueChange={(value) => setAssignedTo(value)}
-              items={children.map((child) => ({
-                label: child.name,
-                value: child._id,
-                key: child._id,
-              }))}
-              value={assignedTo}
-              placeholder={{}}
-              style={pickerSelectStyles}
-              useNativeAndroidPickerStyle={false}
-            />
-          </View>
+        <View style={styles.kidButtonContainer}>
+          {children.map((child) => (
+            <TouchableOpacity
+              key={child._id}
+              style={[
+                styles.kidButton,
+                assignedTo === child._id && styles.kidButtonSelected,
+              ]}
+              onPress={() => setAssignedTo(child._id)}
+            >
+              <Text style={styles.kidButtonText}>{child.name}</Text>
+            </TouchableOpacity>
+          ))}
         </View>
 
         <View style={styles.formGroup}>
@@ -227,32 +222,27 @@ export default function AddTaskScreen({ parentID }: AddTaskScreenProps) {
   );
 }
 
-const pickerSelectStyles = StyleSheet.create({
-  inputIOS: {
-    fontSize: 16,
-    paddingVertical: 14,
-    paddingHorizontal: 12,
-    borderWidth: 1,
-    borderColor: COLORS.lightBlue,
-    borderRadius: 10,
-    color: COLORS.darkBlue,
-    paddingRight: 30,
-    backgroundColor: COLORS.white,
-  },
-  inputAndroid: {
-    fontSize: 16,
-    paddingHorizontal: 12,
-    paddingVertical: 12,
-    borderWidth: 1,
-    borderColor: COLORS.lightBlue,
-    borderRadius: 10,
-    color: COLORS.darkBlue,
-    paddingRight: 30,
-    backgroundColor: COLORS.white,
-  },
-});
-
 const styles = StyleSheet.create({
+  kidButtonContainer: {
+    flexDirection: "row",
+    justifyContent: "space-around",
+    marginBottom: 20,
+  },
+  kidButton: {
+    padding: 20,
+    borderRadius: 20,
+    backgroundColor: COLORS.lightBlue,
+    minWidth: 100,
+    alignItems: "center",
+  },
+  kidButtonSelected: {
+    backgroundColor: COLORS.pink,
+  },
+  kidButtonText: {
+    fontSize: 16,
+    fontWeight: "bold",
+    color: COLORS.darkBlue,
+  },
   screenContainer: {
     flex: 1,
     backgroundColor: COLORS.offWhite,

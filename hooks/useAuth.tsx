@@ -28,8 +28,13 @@ interface AuthContextType {
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export const AuthProvider = ({ children }: { children: ReactNode }) => {
-  const { auth0Domain, auth0ClientId, auth0Audience, USE_FAKE_AUTH } = Constants.expoConfig!.extra as Record<string, string>;
-
+  console.log("Auth0 config:", Constants.expoConfig.extra);
+  const {
+    EXPO_PUBLIC_AUTH0_DOMAIN: auth0Domain,
+    EXPO_PUBLIC_AUTH0_CLIENT_ID: auth0ClientId,
+    EXPO_PUBLIC_AUTH0_AUDIENCE: auth0Audience,
+    USE_FAKE_AUTH
+  } = Constants.expoConfig!.extra as Record<string, string>;
   const discovery = {
     authorizationEndpoint: `https://${auth0Domain}/authorize`,
     tokenEndpoint: `https://${auth0Domain}/oauth/token`,

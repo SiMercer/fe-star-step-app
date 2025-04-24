@@ -86,13 +86,23 @@ export default function ParentDashboard() {
                 )}
               </View>
             ))}
+
+            <TouchableOpacity
+              onPress={() => router.push("/parent/add-child")}
+              style={styles.kidBox}
+            >
+              <View
+                style={[styles.avatar, { justifyContent: "center", alignItems: "center" }]}
+              >
+                <FontAwesome name="plus" size={30} color="#7697F9" />
+              </View>
+              <Text style={styles.kidName}>Add Child</Text>
+            </TouchableOpacity>
           </View>
 
           <Link href="/parent/rewards" asChild>
             <TouchableOpacity style={styles.rewardsButton}>
-              <Text style={styles.rewardsButtonText}>
-                Rewards exchange list
-              </Text>
+              <Text style={styles.rewardsButtonText}>Rewards exchange list</Text>
             </TouchableOpacity>
           </Link>
 
@@ -175,6 +185,7 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: "bold",
     marginBottom: 4,
+    textAlign: "center",
   },
   starBox: {
     backgroundColor: "#FFE178",

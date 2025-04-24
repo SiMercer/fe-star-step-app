@@ -1,6 +1,14 @@
-import { deleteTask, getTaskById, getKidById } from "@/utils/api";
 import React, { useEffect, useState } from "react";
-import { View, Text, StyleSheet, TouchableOpacity, Alert } from "react-native";
+import {
+  View,
+  Text,
+  StyleSheet,
+  TouchableOpacity,
+  Alert,
+  Switch,
+  Image,
+} from "react-native";
+import { deleteTask, getKidById } from "@/utils/api";
 import { useAuth } from "@/hooks/useAuth";
 
 interface TasksCardsProps {
@@ -17,28 +25,29 @@ interface TasksCardsProps {
 }
 
 export default function ParentTaskCard({ task, onDelete }: TasksCardsProps) {
+  const [kidName, setKidName] = useState("Loading...");
+  const [kidAvatar, setKidAvatar] = useState("");
+  const [isCompleted, setIsCompleted] = useState(task.status === "complete");
   const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-  const [kidName, setKidName] = useState<string>("");
   const { parent } = useAuth();
 
   useEffect(() => {
-    const fetchKidName = async () => {
+    const fetchKid = async () => {
       try {
         const kid = await getKidById(task.assignedTo);
         setKidName(kid.name);
+        setKidAvatar(kid.avatar);
       } catch (err) {
-        console.error("Failed to fetch kid name", err);
         setKidName("Unknown");
+        console.error("Failed to fetch kid data", err);
       }
     };
-
-    if (task.assignedTo) {
-      fetchKidName();
-    }
+    if (task.assignedTo) fetchKid();
   }, [task.assignedTo]);
 
-  const handleDelete = (_id: string) => {
+  const toggleSwitch = () => setIsCompleted((prev) => !prev);
+
+  const handleDelete = () => {
     Alert.alert(
       "Confirm Deletion",
       "Are you sure you want to delete this task?",
@@ -47,61 +56,94 @@ export default function ParentTaskCard({ task, onDelete }: TasksCardsProps) {
         {
           text: "Delete",
           style: "destructive",
-          onPress: () => deleteReward(_id),
+          onPress: async () => {
+            setIsLoading(true);
+            try {
+              await deleteTask(task._id);
+              onDelete(task._id);
+            } catch {
+              Alert.alert("Error", "Failed to delete task.");
+            } finally {
+              setIsLoading(false);
+            }
+          },
         },
       ]
     );
   };
 
-  const deleteReward = async (_id: string) => {
-    setIsLoading(true);
-    setError(null);
-
-    try {
-      await deleteTask(_id);
-      onDelete(_id);
-    } catch (err) {
-      setError("Failed to delete task");
-    } finally {
-      setIsLoading(false);
-    }
+  const getTimeRemaining = (dateStr: string) => {
+    const [day, month, year] = dateStr.split("-").map(Number);
+    const deadline = new Date(year, month - 1, day);
+    const diffDays = Math.ceil(
+      (deadline.getTime() - Date.now()) / (1000 * 60 * 60 * 24)
+    );
+    if (diffDays <= 0) return { label: "expired", status: "expired" };
+    if (diffDays <= 2)
+      return {
+        label: `${diffDays} day${diffDays > 1 ? "s" : ""}`,
+        status: "urgent",
+      };
+    return { label: `${diffDays} days`, status: "ok" };
   };
-  console.log(task);
+
+  const { label, status } = getTimeRemaining(task.validBefore);
 
   return (
-    <View style={styles.card}>
-      <View style={styles.headerRow}>
-        <Text style={styles.checkmark}>✔️</Text>
-        <Text style={styles.title}>{task.title}</Text>
-        <View style={styles.kidBubble}>
-          <Text style={styles.kidText}>{kidName || "Loading..."}</Text>
-        </View>
-      </View>
+    <View
+      style={[
+        styles.card,
+        isCompleted
+          ? styles.cardCompleted
+          : status === "expired"
+          ? styles.cardExpired
+          : status === "urgent"
+          ? styles.cardUrgent
+          : styles.cardNormal,
+      ]}
+    >
+      <View style={styles.cardHeader}>
+        <Image
+          source={{
+            uri:
+              kidAvatar ||
+              "https://img.freepik.com/free-vector/businessman-character-avatar-isolated_24877-60111.jpg",
+          }}
+          style={styles.avatar}
+        />
+        <Switch
+          value={isCompleted}
+          onValueChange={toggleSwitch}
+          trackColor={{ false: "#CBD5E1", true: "#A5B4FC" }}
+          thumbColor="#fff"
+        />
 
-      <View style={styles.infoRow}>
-        <View style={styles.starsBox}>
-          <image></image>
-          <Text style={styles.starsText}>{task.starsReward} stars</Text>
+        <View style={styles.taskInfo}>
+          <Text style={styles.taskTitle}>{task.title}</Text>
+          <Text style={styles.kidName}>Assigned to: {kidName}</Text>
+          <Text style={styles.stars}>⭐ {task.starsReward}</Text>
         </View>
-        <View style={styles.timeBox}>
-          <Text style={styles.timeText}>
-            time remaining: {task.validBefore}
+
+        <View style={styles.statusContainer}>
+          <Text style={styles.statusText}>
+            {isCompleted ? "Complete" : task.status}
           </Text>
         </View>
       </View>
 
-      <View style={styles.buttonRow}>
+      <View style={styles.timeBox}>
+        <Text style={styles.timeText}>⏰ {label}</Text>
+      </View>
+
+      <View style={styles.actions}>
+        <TouchableOpacity style={styles.editButton}>
+          <Text style={styles.buttonText}>Edit</Text>
+        </TouchableOpacity>
         <TouchableOpacity
           style={styles.deleteButton}
-          onPress={() => handleDelete(task._id)}
-          disabled={isLoading}
+          onPress={() => handleDelete()}
         >
-          <Text style={styles.actionText}>
-            {isLoading ? "Deleting..." : "delete"}
-          </Text>
-        </TouchableOpacity>
-        <TouchableOpacity style={styles.actionButton}>
-          <Text style={styles.actionText}>{task.status}</Text>
+          <Text style={styles.buttonText}>Delete</Text>
         </TouchableOpacity>
       </View>
     </View>
@@ -113,234 +155,100 @@ const COLORS = {
   lightBlue: "#D1DBFF",
   darkBlue: "#7697F9",
   white: "#FFFEFF",
-  offWhite: "#EBECFF",
 };
 
 const styles = StyleSheet.create({
-  text: {
-    fontSize: 16,
-    marginBottom: 4,
-    color: "#333",
-  },
-  status: {
-    color: "#666",
-    fontStyle: "italic",
-  },
-  buttonsContainer: {
-    flexDirection: "row",
-    justifyContent: "flex-end",
-    marginTop: 10,
-    gap: 8,
-  },
-  button: {
-    paddingVertical: 8,
-    paddingHorizontal: 12,
-    borderRadius: 4,
-    minWidth: 80,
-    alignItems: "center",
-  },
-  buttonText: {
-    color: "white",
-    fontWeight: "bold",
-  },
-  errorText: {
-    color: "red",
-    fontSize: 14,
-    marginTop: 8,
-    textAlign: "center",
-  },
   card: {
-    backgroundColor: COLORS.white,
-    borderRadius: 12,
+    borderRadius: 20,
     padding: 16,
-    marginBottom: 15,
-    borderWidth: 1,
-    borderColor: COLORS.lightBlue,
-    shadowColor: COLORS.darkBlue,
-    shadowOffset: { width: 0, height: 2 },
+    marginVertical: 10,
+    shadowColor: "#000",
     shadowOpacity: 0.1,
-    shadowRadius: 4,
-    elevation: 3,
+    shadowOffset: { width: 0, height: 3 },
+    shadowRadius: 5,
+    elevation: 5,
+  },
+  cardNormal: {
+    backgroundColor: "#F9F9FF",
+  },
+  cardUrgent: {
+    backgroundColor: "#FFF3CD",
+  },
+  cardExpired: {
+    backgroundColor: "#FFD6D6",
+  },
+  cardCompleted: {
+    backgroundColor: "#D4EDDA",
   },
   cardHeader: {
     flexDirection: "row",
-    justifyContent: "space-between",
+    alignItems: "center",
     marginBottom: 12,
   },
-  title: {
-    fontSize: 18,
-    fontWeight: "bold",
-    color: COLORS.darkBlue,
+  avatar: {
+    width: 50,
+    height: 50,
+    borderRadius: 25,
+    marginRight: 12,
+  },
+  taskInfo: {
     flex: 1,
   },
-  statusBadge: {
-    paddingHorizontal: 10,
+  taskTitle: {
+    fontSize: 18,
+    fontWeight: "600",
+    color: "#333",
+  },
+  kidName: {
+    fontSize: 14,
+    color: "#666",
+    marginLeft: 20,
+  },
+  stars: {
+    fontSize: 14,
+    color: "#ffb700",
+    fontWeight: "500",
+  },
+  statusContainer: {
+    paddingHorizontal: 8,
     paddingVertical: 4,
-    borderRadius: 12,
-    alignSelf: "flex-start",
+    backgroundColor: "#e1e1e1",
+    borderRadius: 8,
   },
   statusText: {
-    color: COLORS.white,
     fontSize: 12,
-    fontWeight: "bold",
-    textTransform: "capitalize",
+    color: "#444",
   },
-  detailsRow: {
-    flexDirection: "row",
-    alignItems: "center",
-    marginBottom: 8,
+  timeBox: {
+    backgroundColor: "#eef",
+    padding: 8,
+    borderRadius: 8,
+    marginTop: 8,
   },
-  detailText: {
-    marginLeft: 8,
-    color: COLORS.darkBlue,
+  timeText: {
+    fontSize: 14,
+    color: "#333",
   },
   actions: {
     flexDirection: "row",
     justifyContent: "flex-end",
-    marginTop: 12,
     gap: 10,
+    marginTop: 12,
   },
   editButton: {
-    backgroundColor: COLORS.darkBlue,
-    width: 40,
-    height: 40,
-    borderRadius: 20,
-    justifyContent: "center",
-    alignItems: "center",
+    backgroundColor: "#7697F9",
+    paddingVertical: 6,
+    paddingHorizontal: 12,
+    borderRadius: 10,
   },
   deleteButton: {
-    backgroundColor: COLORS.pink,
-    width: 60,
-    height: 40,
-    borderRadius: 20,
-    justifyContent: "center",
-    alignItems: "center",
-  },
-  backButtonContainer: {
-    flexDirection: "row",
-    justifyContent: "space-around",
-    marginBottom: 20,
-  },
-  headerContainer: {
-    marginTop: 30,
-    width: "90%",
-    display: "flex",
-    flexDirection: "row",
-    justifyContent: "space-evenly",
-  },
-  avatar: {
-    width: 100,
-    height: 100,
-    borderRadius: 50,
-    overflow: "hidden",
-    borderColor: "yellow",
-    justifyContent: "center",
-    alignItems: "center",
-    borderWidth: 2,
-  },
-  starsContainer: {
-    display: "flex",
-    alignContent: "center",
-    alignItems: "center",
-    backgroundColor: "#D1DBFF",
-    borderRadius: "15px",
-    height: "20%",
-    justifyContent: "center",
-    width: "90%",
-    marginTop: 30,
-  },
-
-  rewardTasksContainer: {
-    width: "90%",
-    display: "flex",
-    flexDirection: "row",
-    justifyContent: "space-between",
-  },
-  rewardContainer: {
-    display: "flex",
-    alignContent: "center",
-    alignItems: "center",
-    backgroundColor: "#D1DBFF",
-    borderRadius: "15px",
-    justifyContent: "center",
-    height: 200,
-    width: "45%",
-    marginTop: 30,
-  },
-  taskContainer: {
-    display: "flex",
-    alignContent: "center",
-    alignItems: "center",
-    backgroundColor: "#D1DBFF",
-    borderRadius: "15px",
-    justifyContent: "center",
-    height: 200,
-    width: "45%",
-    marginTop: 30,
-  },
-
-  headerRow: {
-    flexDirection: "row",
-    alignItems: "center",
-    marginBottom: 10,
-    justifyContent: "space-between",
-  },
-  checkmark: {
-    fontSize: 22,
-    marginRight: 10,
-  },
-  kidBubble: {
-    backgroundColor: "#FECACA",
-    paddingHorizontal: 12,
+    backgroundColor: "#FFA1C6",
     paddingVertical: 6,
-    borderRadius: 50,
-    alignItems: "center",
-    justifyContent: "center",
-  },
-  kidText: {
-    fontSize: 14,
-    fontWeight: "bold",
-  },
-  infoRow: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    marginBottom: 10,
-  },
-  starsBox: {
-    backgroundColor: "#FEF08A",
     paddingHorizontal: 12,
-    paddingVertical: 6,
     borderRadius: 10,
   },
-  starsText: {
+  buttonText: {
+    color: "white",
     fontWeight: "bold",
-    color: "#000",
-  },
-  timeBox: {
-    backgroundColor: "#fff",
-    borderWidth: 1,
-    borderColor: "#000",
-    paddingHorizontal: 12,
-    paddingVertical: 6,
-    borderRadius: 10,
-  },
-  timeText: {
-    fontStyle: "italic",
-  },
-  buttonRow: {
-    flexDirection: "row",
-    justifyContent: "space-around",
-    marginTop: 10,
-  },
-  actionButton: {
-    backgroundColor: "#A7F3D0",
-    paddingHorizontal: 16,
-    paddingVertical: 8,
-    borderRadius: 10,
-  },
-  actionText: {
-    color: "#000",
-    fontWeight: "bold",
-    textTransform: "lowercase",
   },
 });

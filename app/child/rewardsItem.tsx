@@ -69,48 +69,77 @@ export default function ChildsRewardsItem({
         });
     }
   }
-  return reward.isRedeemed && reward.redeemedBy !== selectedChild._id ? null : (
-    <View>
-      <View
-        style={
-          reward.isRedeemed && reward.redeemedBy === selectedChild._id
-            ? styles.redeemed
-            : reward.redeemedBy === selectedChild._id || !reward.redeemedBy
-            ? styles.default
-            : styles.greyed
-        }
-      >
-        <StyledText style={{ width: "40%" }}>{reward.title}</StyledText>
-        <StyledText style={{ alignSelf: "center" }}>
-          {reward.cost + "⭐"}
-        </StyledText>
-        <View style={{ width: "40%", alignItems: "flex-end" }}>
-          {reward.isRedeemed ? (
-            <StyledText>🎉 Redeemed!!!</StyledText>
-          ) : reward.redeemedBy !== selectedChild._id && reward.redeemedBy ? (
-            <StyledText>🔒 Requested by {requestedBy}</StyledText>
-          ) : (
-            <>
-              <Pressable
-                style={styles.sliderOutline}
-                onPress={() => handleRequestPress(isRequested)}
-              >
-                <View
-                  style={isRequested ? styles.slider : styles.sliderRequested}
-                ></View>
-              </Pressable>
-              <View>
-                <StyledText>
-                  {isRequested ? "⌛ Waiting" : "🖐️ Request"}
-                </StyledText>
-              </View>
-            </>
-          )}
+  if (reward.isRedeemed && reward.redeemedBy !== selectedChild._id) {
+    return null;
+  } else if (reward.isRedeemed && reward.redeemedBy === selectedChild._id) {
+    return (
+      <View>
+        <View style={styles.redeemed}>
+          <View>
+            <Text style={styles.taskTextLg}>{reward.title}</Text>
+            <Text style={styles.taskTextSm}>{reward.cost + "⭐"}</Text>
+          </View>
+          <View style={{ alignItems: "flex-end" }}>
+            <Text style={styles.taskTextSm}>🎉 Redeemed!!!</Text>
+          </View>
         </View>
+        <StyledText>{requestError}</StyledText>
       </View>
-      <StyledText>{requestError}</StyledText>
-    </View>
-  );
+    );
+  } else if (reward.redeemedBy === selectedChild._id || !reward.redeemedBy) {
+    return (
+      <View>
+        <View style={styles.default}>
+          <View>
+            <Text style={[styles.taskTextLg, { color: "white" }]}>
+              {reward.title}
+            </Text>
+            <Text style={[styles.taskTextSm, { color: "white" }]}>
+              {reward.cost + "⭐"}
+            </Text>
+          </View>
+          <View style={{ alignItems: "flex-end" }}>
+            <Pressable
+              style={styles.sliderOutline}
+              onPress={() => handleRequestPress(isRequested)}
+            >
+              <View
+                style={
+                  isRequested
+                    ? [
+                        styles.slider,
+                        { backgroundColor: "white", borderColor: "white" },
+                      ]
+                    : [styles.sliderRequested, { backgroundColor: "white" }]
+                }
+              ></View>
+            </Pressable>
+            <View>
+              <Text style={[styles.taskTextSm, { color: "white" }]}>
+                {isRequested ? "⌛ Waiting" : "🖐️ Request"}
+              </Text>
+            </View>
+          </View>
+        </View>
+        <StyledText>{requestError}</StyledText>
+      </View>
+    );
+  } else {
+    return (
+      <View>
+        <View style={styles.greyed}>
+          <View>
+            <Text style={styles.taskTextLg}>{reward.title}</Text>
+            <Text style={styles.taskTextSm}>{reward.cost + "⭐"}</Text>
+          </View>
+          <View style={{ alignItems: "flex-end" }}>
+            <Text style={styles.taskTextSm}>🔒 Requested by {requestedBy}</Text>
+          </View>
+        </View>
+        <StyledText>{requestError}</StyledText>
+      </View>
+    );
+  }
 }
 const styles = StyleSheet.create({
   default: {
@@ -122,7 +151,7 @@ const styles = StyleSheet.create({
     justifyContent: "space-between",
     alignItems: "center",
     borderRadius: 15,
-    backgroundColor: "#D1DBFF",
+    backgroundColor: "#7697F9",
     shadowColor: "#000",
     shadowOpacity: 0.25,
     shadowRadius: 4,
@@ -152,7 +181,7 @@ const styles = StyleSheet.create({
     justifyContent: "space-between",
     alignItems: "center",
     borderRadius: 15,
-    backgroundColor: "#ddd",
+    backgroundColor: "#D1DBFF",
     shadowColor: "#000",
     shadowOpacity: 0.25,
     shadowRadius: 4,
@@ -162,7 +191,7 @@ const styles = StyleSheet.create({
     height: 12,
     width: 12,
     borderRadius: 6,
-    backgroundColor: "#000",
+    backgroundColor: "white",
     alignSelf: "flex-end",
     margin: 5,
   },
@@ -170,7 +199,7 @@ const styles = StyleSheet.create({
     height: 12,
     width: 12,
     borderRadius: 6,
-    backgroundColor: "#000",
+    backgroundColor: "white",
     alignSelf: "flex-start",
     margin: 5,
   },
@@ -179,7 +208,15 @@ const styles = StyleSheet.create({
     width: 45,
     borderRadius: 12,
     borderWidth: 2,
-    borderColor: "#000",
+    borderColor: "white",
     justifyContent: "center",
+  },
+  taskTextLg: {
+    fontFamily: "H2",
+    fontSize: 25,
+  },
+  taskTextSm: {
+    fontFamily: "H2",
+    fontSize: 17,
   },
 });

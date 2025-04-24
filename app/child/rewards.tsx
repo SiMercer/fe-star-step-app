@@ -47,7 +47,16 @@ export default function ChildRewardsScreen() {
   if (!selectedChild) {
     return (
       <View style={{ flex: 1, padding: 20 }}>
-        <StyledText style={{ fontSize: 24, marginTop: 20 }}>Rewards</StyledText>
+        <Text
+          style={{
+            fontSize: 35,
+            marginTop: 20,
+            fontFamily: "Titles",
+            color: "#7697F9",
+          }}
+        >
+          Rewards
+        </Text>
         <StyledText style={{ fontSize: 18, marginTop: 10, color: "red" }}>
           No child selected.
         </StyledText>
@@ -55,45 +64,39 @@ export default function ChildRewardsScreen() {
     );
   }
   return (
-    <View
-      style={{
-        flex: 1,
-        justifyContent: "space-between",
-        padding: 30,
-        backgroundColor: "#EBECFF",
-      }}
-    >
-      <View style={styles.header}>
-        <StyledText style={{ fontSize: 24 }}>
-          {selectedChild.name}'s Rewards
-        </StyledText>
-      </View>
-      <StyledText>Total Stars: {totalStars}⭐</StyledText>
-      {!isLoading ? (
-        listRewards.length === 0 ? (
-          <StyledText>There are no rewards</StyledText>
+    <View style={styles.main}>
+      <View style={styles.containerLighter}>
+        <View style={styles.header}>
+          <Text
+            style={{ fontFamily: "Titles", fontSize: 35, color: "#7697F9" }}
+          >
+            {selectedChild.name}'s Rewards
+          </Text>
+        </View>
+        <Text style={{ fontFamily: "H2", fontSize: 24 }}>
+          Total Stars: {totalStars}⭐
+        </Text>
+        {!isLoading ? (
+          listRewards.length === 0 ? (
+            <StyledText>There are no rewards</StyledText>
+          ) : (
+            <ScrollView contentContainerStyle={{ padding: 10 }}>
+              {listRewards.map((reward: Rewards) => {
+                return (
+                  <ChildsRewardsItem
+                    key={reward.reward_id}
+                    reward={reward}
+                    totalStars={totalStars}
+                    setTotalStars={setTotalStars}
+                  />
+                );
+              })}
+            </ScrollView>
+          )
         ) : (
-          <ScrollView contentContainerStyle={{ padding: 10 }}>
-            {listRewards.map((reward: Rewards) => {
-              return (
-                <ChildsRewardsItem
-                  key={reward.reward_id}
-                  reward={reward}
-                  totalStars={totalStars}
-                  setTotalStars={setTotalStars}
-                />
-              );
-            })}
-          </ScrollView>
-        )
-      ) : (
-        <ActivityIndicator />
-      )}
-      <View
-        style={{
-          marginTop: 100,
-        }}
-      >
+          <ActivityIndicator />
+        )}
+        <View style={{ marginTop: 60 }}></View>
         <NavBarKid />
       </View>
     </View>
@@ -101,6 +104,26 @@ export default function ChildRewardsScreen() {
 }
 
 const styles = StyleSheet.create({
+  main: {
+    flex: 1,
+    justifyContent: "space-between",
+    padding: 30,
+    backgroundColor: "#D1DBFF",
+  },
+  containerLighter: {
+    padding: 20,
+    width: "100%",
+    gap: 30,
+    backgroundColor: "#EBECFF",
+    flexDirection: "column",
+    borderRadius: 15,
+    height: "100%",
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 3,
+    elevation: 3,
+  },
   header: {
     marginTop: 20,
     flexDirection: "row",

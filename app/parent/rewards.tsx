@@ -14,6 +14,7 @@ import AddRewardForm from "./add-rewards";
 import { router } from "expo-router";
 import { editReward, getRewardsByParent } from "@/utils/api";
 import { useAuth } from "@/hooks/useAuth";
+import { StyledText } from "@/contexts/fonts";
 
 interface Rewards {
   reward_id: string;
@@ -108,7 +109,10 @@ export default function ParentRewardsScreen({
       </TouchableOpacity>
 
       <ScrollView contentContainerStyle={styles.container}>
-        <Text style={styles.heading}>Rewards</Text>
+        <StyledText style={{ fontSize: 40, color: "#7697F9", marginTop: 10 }}>
+          {" "}
+          Rewards{" "}
+        </StyledText>
         <RewardCardList
           key={refreshKey}
           rewards={rewards}
@@ -173,7 +177,7 @@ const styles = StyleSheet.create({
   },
   container: {
     padding: 20,
-    paddingTop: 10,
+    paddingTop: 100,
   },
   heading: {
     fontSize: 28,

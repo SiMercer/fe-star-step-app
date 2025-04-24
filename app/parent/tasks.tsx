@@ -12,11 +12,12 @@ import { router } from "expo-router";
 import { getTasksByParent } from "@/utils/api";
 import ParentTaskCard from "./taskcards";
 import { useAuth } from "@/hooks/useAuth";
+import { StyledText } from "@/contexts/fonts";
 
 interface Tasks {
   _id: string;
   title: string;
-  starsRewards: number;
+  starsReward: number;
   validBefore: string;
   assignedTo: string;
   createdBy: string;
@@ -86,7 +87,10 @@ export default function ParentTasksScreen() {
       </TouchableOpacity>
 
       <ScrollView contentContainerStyle={styles.scrollContainer}>
-        <Text style={styles.heading}>Tasks</Text>
+        <StyledText style={{ fontSize: 40, color: "#7697F9", marginTop: 10 }}>
+          {" "}
+          Task{" "}
+        </StyledText>
 
         <View style={styles.tasksContainer}>
           {tasks.length > 0 ? (

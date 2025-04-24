@@ -8,7 +8,7 @@ import {
   Switch,
   Image,
 } from "react-native";
-import { deleteTask, getKidById } from "@/utils/api";
+import { deleteTask, editTask, getKidById } from "@/utils/api";
 import { useAuth } from "@/hooks/useAuth";
 
 interface TasksCardsProps {
@@ -31,6 +31,8 @@ export default function ParentTaskCard({ task, onDelete }: TasksCardsProps) {
   const [isLoading, setIsLoading] = useState(false);
   const { parent } = useAuth();
 
+  console.log(task);
+
   useEffect(() => {
     const fetchKid = async () => {
       try {
@@ -45,7 +47,11 @@ export default function ParentTaskCard({ task, onDelete }: TasksCardsProps) {
     if (task.assignedTo) fetchKid();
   }, [task.assignedTo]);
 
-  const toggleSwitch = () => setIsCompleted((prev) => !prev);
+  const toggleSwitch = () => {
+    setIsCompleted((prev) => !prev);
+    editTask(task._id, { status: "complete" });
+    console.log(task.status);
+  };
 
   const handleDelete = () => {
     Alert.alert(

@@ -54,7 +54,9 @@ export default function ParentTasksScreen() {
   }, []);
 
   const handleTaskDeleted = (taskId: string) => {
-    setTasks(tasks.filter((task) => task._id !== taskId));
+    setTasks(
+      tasks.filter((task) => task._id !== taskId && task.status === "new")
+    );
   };
 
   if (isLoading) {

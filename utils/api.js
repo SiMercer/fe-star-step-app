@@ -123,7 +123,7 @@ export const getTasksByParent = (parent_id) => {
 
 export const getTasksByKid = (kid_id) => {
   return apiRequest
-    .get(`tasks/kids/${kid_id}`)
+    .get(`tasks/assigned/${kid_id}`)
     .then(({ data }) => {
       return data;
     })

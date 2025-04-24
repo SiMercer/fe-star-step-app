@@ -14,6 +14,8 @@ import { useRouter } from "expo-router";
 import { useAuth } from "../../hooks/useAuth";
 import { createKidProfile } from "@/utils/api";
 import { useChild } from "@/contexts/ChildContext";
+import { TouchableOpacity } from "react-native";
+import { FontAwesome } from "@expo/vector-icons";
 
 export default function ParentAddChildScreen() {
   const router = useRouter();
@@ -61,21 +63,14 @@ export default function ParentAddChildScreen() {
   return (
     <View style={styles.container}>
       <View style={styles.containerLighter}>
-        <Pressable
-          onPress={() => router.push("/parent")}
-          style={{ alignItems: "flex-end" }}
-        >
-          <View
-            style={{
-              width: 30,
-              height: 30,
-
-              borderRadius: 25,
-            }}
+        <View style={{ height: "5%" }}>
+          <TouchableOpacity
+            onPress={() => router.push("/parent")}
+            style={styles.dashboardIcon}
           >
-            <Text style={{ fontSize: 30 }}>↪️</Text>
-          </View>
-        </Pressable>
+            <FontAwesome name="home" size={24} color="#7697F9" />
+          </TouchableOpacity>
+        </View>
         <View style={styles.headerContainer}>
           <View>
             <Text style={{ fontSize: 30 }}>⭐️</Text>
@@ -83,7 +78,7 @@ export default function ParentAddChildScreen() {
           <View style={styles.header}>
             <Text
               style={{
-                fontFamily: "Titles",
+                fontFamily: "Poppins",
                 fontSize: 35,
                 color: "#7697F9",
                 fontWeight: "bold",
@@ -170,7 +165,11 @@ export default function ParentAddChildScreen() {
           >
             <View>
               <Text
-                style={{ color: "#FFFEFF", fontFamily: "Titles", fontSize: 22 }}
+                style={{
+                  color: "#FFFEFF",
+                  fontFamily: "Poppins",
+                  fontSize: 22,
+                }}
               >
                 Create Kid's account{" "}
               </Text>
@@ -289,7 +288,7 @@ const styles = StyleSheet.create({
     elevation: 5,
   },
   inputLabel: {
-    fontFamily: "Titles",
+    fontFamily: "Poppins",
     fontSize: 22,
     color: "#7697F9",
   },
@@ -325,5 +324,16 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.2,
     shadowRadius: 5,
     elevation: 5,
+  },
+  dashboardIcon: {
+    position: "absolute",
+    backgroundColor: "#FFFEFF",
+    padding: 10,
+    borderRadius: 20,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.1,
+    shadowRadius: 2,
+    elevation: 2,
   },
 });

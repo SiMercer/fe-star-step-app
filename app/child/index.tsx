@@ -5,6 +5,8 @@ import { getRewardsByParent, getTasksByParent } from "@/utils/api";
 import NavBarKid from "./NavBarKid";
 import { Child, useChild } from "@/contexts/ChildContext";
 import { useAuth } from "@/hooks/useAuth";
+import { TouchableOpacity } from "react-native";
+import { FontAwesome } from "@expo/vector-icons";
 
 export default function ChildDashboardScreen() {
   const { selectedChild } = useChild();
@@ -45,21 +47,14 @@ export default function ChildDashboardScreen() {
   return (
     <View style={styles.main}>
       <View style={styles.containerLighter}>
-        <Pressable
-          onPress={() => router.push("/")}
-          style={{ alignItems: "flex-end" }}
-        >
-          <View
-            style={{
-              width: 30,
-              height: 30,
-
-              borderRadius: 25,
-            }}
+        <View style={{ height: "5%" }}>
+          <TouchableOpacity
+            onPress={() => router.push("/")}
+            style={styles.dashboardIcon}
           >
-            <Text style={{ fontSize: 30 }}>↪️</Text>
-          </View>
-        </Pressable>
+            <FontAwesome name="home" size={24} color="#7697F9" />
+          </TouchableOpacity>
+        </View>
         <View style={styles.headerContainer}>
           <Image source={{ uri: kid.avatar }} style={styles.avatar}></Image>
           <Text
@@ -279,5 +274,17 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.2,
     shadowRadius: 5,
     elevation: 5,
+  },
+  dashboardIcon: {
+    position: "absolute",
+
+    backgroundColor: "#FFFEFF",
+    padding: 10,
+    borderRadius: 20,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.1,
+    shadowRadius: 2,
+    elevation: 2,
   },
 });

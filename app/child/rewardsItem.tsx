@@ -76,11 +76,17 @@ export default function ChildsRewardsItem({
       <View>
         <View style={styles.redeemed}>
           <View>
-            <Text style={styles.taskTextLg}>{reward.title}</Text>
-            <Text style={styles.taskTextSm}>{reward.cost + "⭐"}</Text>
+            <Text style={[styles.taskTextLg, { color: "white" }]}>
+              {reward.title}
+            </Text>
+            <Text style={[styles.taskTextSm, { color: "white" }]}>
+              {reward.cost + "⭐"}
+            </Text>
           </View>
           <View style={{ alignItems: "flex-end" }}>
-            <Text style={styles.taskTextSm}>🎉 Redeemed!!!</Text>
+            <Text style={[styles.taskTextSm, { color: "white" }]}>
+              🎉 Redeemed!!!
+            </Text>
           </View>
         </View>
         <StyledText>{requestError}</StyledText>

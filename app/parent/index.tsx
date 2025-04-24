@@ -115,7 +115,7 @@ export default function ParentDashboard() {
           <View style={styles.newTaskRow}>
             <Link href="/parent/tasks" asChild>
               <TouchableOpacity style={styles.newTaskButton}>
-                <Text style={styles.newTaskButtonText}>Add the new task</Text>
+                <Text style={styles.newTaskButtonText}>Add a new task</Text>
               </TouchableOpacity>
             </Link>
           </View>
@@ -211,13 +211,13 @@ const styles = StyleSheet.create({
     marginTop: 20,
   },
   newTaskButton: {
-    backgroundColor: "#FDBA74",
+    backgroundColor: "#7697F9",
     paddingVertical: 10,
     paddingHorizontal: 20,
     borderRadius: 16,
   },
   newTaskButtonText: {
-    color: "#7C2D12",
+    color: "white",
     fontWeight: "bold",
   },
   logoutButton: {

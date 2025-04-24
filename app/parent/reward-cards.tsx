@@ -1,4 +1,5 @@
-import React from "react";
+import { editReward, getKidById } from "@/utils/api";
+import React, { useEffect, useState } from "react";
 import { View, Text, StyleSheet, TouchableOpacity } from "react-native";
 
 type Reward = {
@@ -14,7 +15,6 @@ type RewardCardProps = {
   reward: Reward;
   handleDelete: (rewardId: string) => void;
   handleEdit?: (reward: Reward) => void;
-
   isDeleting?: boolean;
 };
 
@@ -24,26 +24,71 @@ export default function RewardCard({
   handleEdit,
   isDeleting,
 }: RewardCardProps) {
+  const [kidName, setKidName] = useState("Loading...");
+  const [grant, setGranted] = useState(reward.isRedeemed);
+
+  useEffect(() => {
+    const fetchKid = async () => {
+      try {
+        const kid = await getKidById(reward.redeemedBy);
+        setKidName(kid.name);
+      } catch (err) {
+        setKidName("Unknown");
+        console.error("Failed to fetch kid data", err);
+      }
+    };
+    if (reward.redeemedBy) fetchKid();
+  }, [reward.redeemedBy]);
+
+  const handleGrant = async () => {
+    try {
+      await editReward(reward.reward_id, { isRedeemed: true });
+      setGranted(true);
+    } catch (err) {
+      console.error("Failed to grant reward", err);
+    }
+  };
+
+  const isRequested = reward.redeemedBy && !grant;
+
   return (
     <View
-      style={styles.card}
+      style={[styles.card, isRequested && { backgroundColor: COLORS.offWhite }]}
       accessible={true}
       accessibilityLabel={`Reward: ${reward.title}, Stars: ${reward.cost} ⭐ `}
     >
       <Text style={styles.title}>{reward.title}</Text>
       <Text style={styles.text}>Stars: {reward.cost} ⭐ </Text>
-      <Text style={[styles.text, reward.isRedeemed && { color: "#ff4444" }]}>
-        Status: {reward.isRedeemed ? "Redeemed" : "Available"}
+
+      {/* Grant button */}
+      {isRequested && (
+        <TouchableOpacity
+          style={[styles.button, styles.grantButton]}
+          onPress={handleGrant}
+          accessibilityLabel="Grant reward"
+        >
+          <Text style={styles.grantButtonText}>Grant</Text>
+        </TouchableOpacity>
+      )}
+
+      <Text
+        style={[
+          styles.text,
+          (reward.isRedeemed || grant) && { color: "#ff4444" },
+        ]}
+      >
+        Status: {reward.redeemedBy ? `requested by ${kidName}` : "available"}
       </Text>
-      {reward.isRedeemed && reward.redeemedBy && (
+
+      {(reward.isRedeemed || grant) && reward.redeemedBy && (
         <Text style={[styles.text, { color: "#888" }]}>
-          Redeemed by: {reward.redeemedBy}
+          Redeemed by: {kidName}
         </Text>
       )}
 
+      {/* Action buttons */}
       <View style={styles.buttonsContainer}>
-        {/* Only show edit button if not redeemed and edit handler provided */}
-        {handleEdit && !reward.isRedeemed && (
+        {handleEdit && !grant && (
           <TouchableOpacity
             style={[styles.button, styles.editButton]}
             onPress={() => handleEdit(reward)}
@@ -67,11 +112,11 @@ export default function RewardCard({
 }
 
 const COLORS = {
-  pink: "#FFA1C6", // Primary accent color
-  lightBlue: "#D1DBFF", // Secondary color
-  darkBlue: "#7697F9", // Primary action color
-  white: "#FFFEFF", // Pure white
-  offWhite: "#EBECFF", // Background/light color
+  pink: "#FFA1C6",
+  lightBlue: "#D1DBFF",
+  darkBlue: "#7697F9",
+  white: "#FFFEFF",
+  offWhite: "#F0F0F0", // More visibly grey background
 };
 
 const styles = StyleSheet.create({
@@ -120,5 +165,18 @@ const styles = StyleSheet.create({
   buttonText: {
     color: COLORS.white,
     fontWeight: "bold",
+  },
+  grantButton: {
+    backgroundColor: COLORS.darkBlue,
+    alignSelf: "center",
+    paddingVertical: 4,
+    paddingHorizontal: 12,
+    borderRadius: 12,
+    marginTop: 10,
+  },
+  grantButtonText: {
+    color: COLORS.white,
+    fontSize: 14,
+    fontWeight: "600",
   },
 });

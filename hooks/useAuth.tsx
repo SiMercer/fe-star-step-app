@@ -12,7 +12,7 @@ import {
   makeRedirectUri,
   ResponseType,
 } from "expo-auth-session";
-import * as SecureStore from "expo-secure-store";
+import { getItem, saveItem, deleteItem } from "@/utils/storage";
 
 interface Parent {
   _id: string;
@@ -59,8 +59,8 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
   useEffect(() => {
     const loadStoredSession = async () => {
-      const storedToken = await SecureStore.getItemAsync("accessToken");
-      const storedParent = await SecureStore.getItemAsync("parent");
+      const storedToken = await getItem("accessToken");
+      const storedParent = await getItem("parent");
 
       if (storedToken && storedParent) {
         setAccessToken(storedToken);
@@ -101,8 +101,8 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
           if (!apiRes.ok) throw new Error(data.msg);
 
           setParent(data);
-          await SecureStore.setItemAsync("accessToken", token);
-          await SecureStore.setItemAsync("parent", JSON.stringify(data));
+          await saveItem("accessToken", token);
+          await saveItem("parent", JSON.stringify(data));
         } catch (err) {
           console.error("Login/register error:", err);
           setParent(null);
@@ -130,8 +130,8 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const logout = () => {
     setParent(null);
     setAccessToken(null);
-    SecureStore.deleteItemAsync("accessToken");
-    SecureStore.deleteItemAsync("parent");
+    deleteItem("accessToken");
+    deleteItem("parent");
 
     if (USE_FAKE_AUTH !== "true") {
       const returnTo = encodeURIComponent(makeRedirectUri({ useProxy: true }));

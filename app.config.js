@@ -9,12 +9,11 @@ export default {
     platforms: ["ios", "android", "web"],
     plugins: ["expo-secure-store", "expo-font"],
     extra: {
-      auth0Domain: process.env.EXPO_PUBLIC_AUTH0_DOMAIN,
-      auth0ClientId: process.env.EXPO_PUBLIC_AUTH0_CLIENT_ID,
-      auth0Audience: process.env.EXPO_PUBLIC_AUTH0_AUDIENCE,
-      redirectUri: "https://starsteps.netlify.app/auth-callback.html",
+      EXPO_PUBLIC_AUTH0_DOMAIN: process.env.EXPO_PUBLIC_AUTH0_DOMAIN,
+      EXPO_PUBLIC_AUTH0_CLIENT_ID: process.env.EXPO_PUBLIC_AUTH0_CLIENT_ID,
+      EXPO_PUBLIC_AUTH0_AUDIENCE: process.env.EXPO_PUBLIC_AUTH0_AUDIENCE,
+      USE_FAKE_AUTH: process.env.USE_FAKE_AUTH,
       eas: { projectId: "c8a1b3ad-3dc4-42fc-a90d-0625eeec160f" },
-      USE_FAKE_AUTH: "true",
     },
     updates: {
       url: "https://u.expo.dev/c8a1b3ad-3dc4-42fc-a90d-0625eeec160f",

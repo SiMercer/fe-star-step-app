@@ -5,21 +5,22 @@ import {
   Text,
   StyleSheet,
   Image,
-  Alert,
   Pressable,
 } from "react-native";
 import { Link, useRouter } from "expo-router";
 import { useAuth } from "../hooks/useAuth";
 import { useChild } from "../contexts/ChildContext";
 import { StyledText } from "../contexts/fonts";
+import Constants from "expo-constants";
 
 export default function HomeScreen() {
-  const { parent, isLoading, login, logout } = useAuth();
+  const { parent, isLoading, login } = useAuth();
   const { setSelectedChild } = useChild();
   const [children, setChildren] = useState([]);
   const router = useRouter();
 
   useEffect(() => {
+    console.log("Auth0 config:", Constants.expoConfig.extra);
     if (parent?._id) {
       fetch(
         `https://be-star-step-app-dev.onrender.com/api/kids/parent/${parent._id}`
@@ -38,18 +39,6 @@ export default function HomeScreen() {
   const handleSelectChild = (child) => {
     setSelectedChild(child);
     router.push("/child");
-  };
-
-  const alertConfirmLogout = () => {
-    Alert.alert(
-      "Log Out",
-      "Are you sure you want to log out?",
-      [
-        { text: "Cancel", style: "cancel" },
-        { text: "Log Out", onPress: logout },
-      ],
-      { cancelable: true }
-    );
   };
 
   const fallbackUri =
@@ -98,6 +87,13 @@ export default function HomeScreen() {
               </View>
             </>
           )}
+
+          {/* Show Dashboard button only when logged in */}
+          <Link href="/parent/pin" asChild>
+            <Pressable style={styles.navButton}>
+              <Text style={styles.buttonText}>Parent Dashboard</Text>
+            </Pressable>
+          </Link>
         </>
       ) : (
         <>
@@ -106,30 +102,6 @@ export default function HomeScreen() {
           </Pressable>
         </>
       )}
-
-      <Link href="/parent/pin" asChild>
-        <Pressable style={styles.navButton}>
-          <Text style={styles.buttonText}>Parent Dashboard</Text>
-        </Pressable>
-      </Link>
-
-      <View style={styles.bottomNav}>
-        <View style={styles.rowButtons}>
-          <Pressable
-            style={styles.smallNavButton}
-            onPress={login}
-            disabled={isLoading}
-          >
-            <Text style={styles.buttonText}>
-              {isLoading ? "Loading…" : "Parent Login"}
-            </Text>
-          </Pressable>
-
-          <Pressable style={styles.smallNavButton} onPress={alertConfirmLogout}>
-            <Text style={styles.buttonText}>Log Out</Text>
-          </Pressable>
-        </View>
-      </View>
     </ScrollView>
   );
 }
@@ -179,7 +151,7 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.15,
     shadowRadius: 4,
     elevation: 4,
-    transitionDuration: "200ms", // Web only
+    transitionDuration: "200ms",
   },
   childBoxHover: {
     backgroundColor: "#c8d5ff",
@@ -201,30 +173,12 @@ const styles = StyleSheet.create({
     color: "#333",
     textAlign: "center",
   },
-  bottomNav: {
-    marginTop: 30,
-    width: "100%",
-    alignItems: "center",
-  },
-  rowButtons: {
-    flexDirection: "row",
-    justifyContent: "center",
-    marginBottom: 12,
-  },
-  smallNavButton: {
-    backgroundColor: "#FFFEEF",
-    paddingVertical: 10,
-    paddingHorizontal: 20,
-    borderRadius: 16,
-    marginHorizontal: 6,
-    alignItems: "center",
-  },
   navButton: {
     backgroundColor: "#FFFEEF",
     paddingVertical: 12,
     paddingHorizontal: 30,
     borderRadius: 20,
-    marginVertical: 5,
+    marginVertical: 20,
     width: "80%",
     alignItems: "center",
   },

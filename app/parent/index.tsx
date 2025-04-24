@@ -123,7 +123,7 @@ export default function ParentDashboard() {
           </View>
 
           <View style={styles.newTaskRow}>
-            <Link href="/parent/add-tasks" asChild>
+            <Link href="/parent/tasks" asChild>
               <TouchableOpacity style={styles.newTaskButton}>
                 <Text style={styles.newTaskButtonText}>Add a new task</Text>
               </TouchableOpacity>

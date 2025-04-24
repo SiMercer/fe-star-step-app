@@ -128,11 +128,10 @@ export default function ParentTaskCard({ task, onDelete }: TasksCardsProps) {
           <Text style={styles.statusText}>
             {isCompleted ? "Complete" : task.status}
           </Text>
+          <View style={styles.timeBox}>
+            <Text style={styles.timeText}>⏰ {label}</Text>
+          </View>
         </View>
-      </View>
-
-      <View style={styles.timeBox}>
-        <Text style={styles.timeText}>⏰ {label}</Text>
       </View>
 
       <View style={styles.actions}>

@@ -20,8 +20,13 @@ export default function PinScreen() {
   const [confirmPin, setConfirmPin] = useState("");
   const [inputPin, setInputPin] = useState("");
   const [loading, setLoading] = useState(true);
+
   const BACKEND =
     process.env.EXPO_PUBLIC_BACKEND_URL || "https://be-star-step-app-dev.onrender.com";
+
+    const [errorMessage, setErrorMessage] = useState('');
+
+
 
   useEffect(() => {
     const fetchPin = async () => {
@@ -67,9 +72,10 @@ export default function PinScreen() {
 
   const handleValidatePin = () => {
     if (inputPin === storedPin) {
+      setErrorMessage('');
       router.push("/parent");
     } else {
-      Alert.alert("Incorrect PIN", "Please try again.");
+      setErrorMessage('Incorrect PIN. Please try again.');
     }
   };
 
@@ -85,9 +91,9 @@ export default function PinScreen() {
 
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>
-        {needsPinCreation ? "Create Your PIN" : "Enter Your PIN"}
-      </Text>
+<Text style={[styles.errorText, { display: errorMessage ? 'flex' : 'none' }]}>
+  {errorMessage}
+</Text>
 
       {needsPinCreation ? (
         <>
@@ -168,5 +174,10 @@ const styles = StyleSheet.create({
     color: "#fff",
     fontWeight: "600",
     fontSize: 16,
+  },
+  errorText: {
+    color: 'red',
+    marginBottom: 12,
+    fontSize: 14,
   },
 });

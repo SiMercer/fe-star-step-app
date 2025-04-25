@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import {
+  Button,
   ScrollView,
   View,
   Text,
@@ -14,13 +15,22 @@ import { StyledText } from "../contexts/fonts";
 import Constants from "expo-constants";
 
 export default function HomeScreen() {
-  const { parent, isLoading, login } = useAuth();
+  const { setParent, setAccessToken, parent, isLoading, login } = useAuth();
   const { setSelectedChild } = useChild();
   const [children, setChildren] = useState([]);
   const router = useRouter();
 
+  const devLoginWithParentId = async () => {
+    const fakeParentUser = {
+      _id: "6808a0e1ca7b9a4184258973",
+      parentName: "Dev Parent",
+    };
+    setParent(fakeParentUser);
+    setAccessToken("local-test-id");
+  };
+
   useEffect(() => {
-    console.log("Auth0 config:", Constants.expoConfig.extra);
+    console.log("Auth0 config:", Constants.expoConfig?.extra);
     if (parent?._id) {
       fetch(
         `https://be-star-step-app-dev.onrender.com/api/kids/parent/${parent._id}`
@@ -87,8 +97,6 @@ export default function HomeScreen() {
               </View>
             </>
           )}
-
-          {/* Show Dashboard button only when logged in */}
           <Link href="/parent/pin" asChild>
             <Pressable style={styles.navButton}>
               <Text style={styles.buttonText}>Parent Dashboard</Text>
@@ -96,11 +104,20 @@ export default function HomeScreen() {
           </Link>
         </>
       ) : (
-        <>
-          <Pressable style={styles.loginButton} onPress={login}>
-            <Text style={styles.buttonText}>Log In</Text>
-          </Pressable>
-        </>
+        <Pressable style={styles.loginButton} onPress={login}>
+          <Text style={styles.buttonText}>Log In or Register</Text>
+        </Pressable>
+        
+      )}
+
+      <View style={{ flex: 1 }} />
+
+      {!parent && (
+        <Pressable style={styles.devLoginButton} onPress={devLoginWithParentId}>
+  <Text style={styles.devLoginText}>
+    Try StarStep without sign up here! [pin = 1234]
+  </Text>
+</Pressable>
       )}
     </ScrollView>
   );
@@ -186,5 +203,19 @@ const styles = StyleSheet.create({
     color: "#000",
     fontSize: 16,
     fontWeight: "600",
+  },
+  devLoginButton: {
+    backgroundColor: "#D1DBFF",
+    paddingVertical: 12,
+    paddingHorizontal: 24,
+    borderRadius: 20,
+    marginVertical: 10,
+    alignItems: "center",
+  },
+  devLoginText: {
+    color: "black",
+    fontWeight: "bold",
+    fontSize: 14,
+    textAlign: "center",
   },
 });

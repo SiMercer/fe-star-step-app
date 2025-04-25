@@ -51,12 +51,21 @@ export default function ParentDashboard() {
 
   return (
     <ScrollView contentContainerStyle={styles.container}>
+
       <TouchableOpacity
         onPress={() => router.push("/")}
         style={styles.dashboardIcon}
       >
         <FontAwesome name="home" size={24} color="#7697F9" />
       </TouchableOpacity>
+
+      <TouchableOpacity
+  onPress={logout}
+  style={styles.logoutIcon}
+>
+  <FontAwesome name="sign-out" size={24} color="#FFA1C6" />
+  <Text style={styles.logoutText}>Sign Out</Text>
+</TouchableOpacity>
 
       <Text style={styles.title}>Parent Dashboard</Text>
 
@@ -129,10 +138,6 @@ export default function ParentDashboard() {
               </TouchableOpacity>
             </Link>
           </View>
-
-          <TouchableOpacity style={styles.logoutButton} onPress={logout}>
-            <Text style={styles.logoutText}>Log Out</Text>
-          </TouchableOpacity>
         </>
       )}
     </ScrollView>
@@ -231,17 +236,6 @@ const styles = StyleSheet.create({
     color: "white",
     fontWeight: "bold",
   },
-  logoutButton: {
-    backgroundColor: "#FFA1C6",
-    paddingVertical: 10,
-    paddingHorizontal: 20,
-    borderRadius: 20,
-    marginTop: 24,
-  },
-  logoutText: {
-    color: "#000",
-    fontWeight: "600",
-  },
   dashboardIcon: {
     position: "absolute",
     top: 20,
@@ -249,6 +243,23 @@ const styles = StyleSheet.create({
     backgroundColor: "#FFFEFF",
     padding: 10,
     borderRadius: 20,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.1,
+    shadowRadius: 2,
+    elevation: 2,
+  },
+  logoutIcon: {
+    position: "absolute",
+    top: 20,
+    right: 20,
+    backgroundColor: "#FFFEFF",
+    paddingVertical: 10,
+    paddingHorizontal: 16,
+    borderRadius: 20,
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 8,
     shadowColor: "#000",
     shadowOffset: { width: 0, height: 1 },
     shadowOpacity: 0.1,

@@ -1,50 +1,32 @@
-# Welcome to your Expo app 👋
+Starstep is an app that allows parents to assign tasks to their children and track their progress using a reward-based system.When a child marks a task as complete, the parent can approve/disaprove the completion.If approved,the child's star count increase, and the child can request for a reward on the rewads page.
 
-This is an [Expo](https://expo.dev) project created with [`create-expo-app`](https://www.npmjs.com/package/create-expo-app).
+The application can be found at :
+https://starsteps.netlify.app/
 
-## Get started
+The back-end can be found at :
+https://github.com/younesabd100/be-star-step-app
 
-1. Install dependencies
 
-   ```bash
-   npm install
-   ```
+The minimum version of Node required to run locally is v23.6.1
 
-2. Start the app
+# Instructions
 
-   ```bash
-    npx expo start
-   ```
+1. clone the repo using this command:
+   git clone <repo-url>
 
-In the output, you'll find options to open the app in a
+2. Open the cloned repository using:
+   cd fe-star-step-app
 
-- [development build](https://docs.expo.dev/develop/development-builds/introduction/)
-- [Android emulator](https://docs.expo.dev/workflow/android-studio-emulator/)
-- [iOS simulator](https://docs.expo.dev/workflow/ios-simulator/)
-- [Expo Go](https://expo.dev/go), a limited sandbox for trying out app development with Expo
+3. Once opened, install the required dependencies :
+   npm i
 
-You can start developing by editing the files inside the **app** directory. This project uses [file-based routing](https://docs.expo.dev/router/introduction).
+4. Run the app using: 
+  'npx expo start --clear'
 
-## Get a fresh project
-
-When you're ready, run:
-
-```bash
-npm run reset-project
-```
-
-This command will move the starter code to the **app-example** directory and create a blank **app** directory where you can start developing.
-
-## Learn more
-
-To learn more about developing your project with Expo, look at the following resources:
-
-- [Expo documentation](https://docs.expo.dev/): Learn fundamentals, or go into advanced topics with our [guides](https://docs.expo.dev/guides).
-- [Learn Expo tutorial](https://docs.expo.dev/tutorial/introduction/): Follow a step-by-step tutorial where you'll create a project that runs on Android, iOS, and the web.
-
-## Join the community
-
-Join our community of developers creating universal apps.
-
-- [Expo on GitHub](https://github.com/expo/expo): View our open source platform and contribute.
-- [Discord community](https://chat.expo.dev): Chat with Expo users and ask questions.
+# User Stories
+1. As a parent, I can assign tasks to my child and set stars for each task.
+2. As a parent, I can view my child's progress and can reward them when tasks 
+are completed.
+3. As a child, I can view my tasks, their due date and I am able to mark it done.
+4. As a child, I'm able to view my star count and request rewards.
+5. As a parent, I am able to approve or dispprove completion.
